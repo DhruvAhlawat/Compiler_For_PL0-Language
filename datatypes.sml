@@ -11,10 +11,13 @@ struct
         | orOp of BOOLEXP*BOOLEXP | notOp of BOOLEXP | TRUE | FALSE | lt of EXP * EXP 
         | gt of EXP * EXP | leq of EXP * EXP | geq of EXP * EXP 
     (*datatype COMMANDSEQ = COMMAND list*)
-    datatype COMMANDSEQ = COMMAND list
-    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMAND * COMMAND
-        | WhileCMD of BOOLEXP * COMMAND | AssignmentCMD of string * EXP 
-    
+    datatype COMMANDSEQ = empty | cons of COMMAND * COMMANDSEQ
+    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ
+
+    (* datatype curType = INT of BigInt.bigint |
+                          RAT of Rational.rational |
+                          BOOL of bool |
+                          NONE *)
     
 
 
@@ -36,9 +39,10 @@ struct
         |   evalBool(orOp(a,b)) = (evalBool(a)) orelse (evalBool(b))
         |   evalBool(andOp(a,b)) = (evalBool(a)) andalso (evalBool(b))
     and runCMD(PrintCMD(a)) = print(Rational.showRat(eval(a)))
-        |   runCMD(ConditionalCMD(a,b,c)) = if(evalBool(a)) then runCMD(b) else runCMD(c)    
-    and runCMDSeq(nil) = ()
-        |   runCMDSeq(h::t) = (runCMD(h); runCMDSeq(t));
+        |   runCMD(ConditionalCMD(a,b,c)) = if(evalBool(a)) then runCMDSeq(b) else runCMDSeq(c)    
+    
+    and runCMDSeq(empty) = ()
+        |   runCMDSeq(cons(h,t)) = (runCMD(h); runCMDSeq(t)); (*runs it in sequence, but in the reverse order currently*)
 
 
 

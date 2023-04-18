@@ -7,7 +7,7 @@ state 0:
 	PRINT	shift 3
 	IF	shift 2
 
-	Program	goto 49
+	Program	goto 62
 	command	goto 1
 
 	.	error
@@ -25,7 +25,7 @@ state 1:
 
 state 2:
 
-	command : IF . boolExp THEN command EOL ELSE command EOL FI 
+	command : IF . boolExp THEN commandSeq ELSE commandSeq FI 
 
 	LPAREN	shift 13
 	FALSE	shift 12
@@ -79,7 +79,7 @@ state 5:
 
 state 6:
 
-	command : IF boolExp . THEN command EOL ELSE command EOL FI 
+	command : IF boolExp . THEN commandSeq ELSE commandSeq FI 
 	boolExp : boolExp . AND boolExp 
 	boolExp : boolExp . OR boolExp 
 
@@ -94,6 +94,9 @@ state 6:
 state 7:
 
 	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
 	boolExp : exp . EQ exp 
 	boolExp : exp . NEQ exp 
 	boolExp : exp . LT exp 
@@ -101,7 +104,10 @@ state 7:
 	boolExp : exp . GT exp 
 	boolExp : exp . GEQ exp 
 
-	ADD	shift 26
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
 	LT	shift 25
 	LEQ	shift 24
 	GT	shift 23
@@ -125,27 +131,30 @@ state 8:
 	NOT	shift 8
 
 	exp	goto 7
-	boolExp	goto 27
+	boolExp	goto 30
 
 	.	error
 
 
 state 9:
 
-	exp : DECI .  (reduce by rule 3)
+	exp : DECI .  (reduce by rule 6)
 
-	RPAREN	reduce by rule 3
-	ADD	reduce by rule 3
-	EOL	reduce by rule 3
-	AND	reduce by rule 3
-	OR	reduce by rule 3
-	LT	reduce by rule 3
-	LEQ	reduce by rule 3
-	GT	reduce by rule 3
-	GEQ	reduce by rule 3
-	NEQ	reduce by rule 3
-	EQ	reduce by rule 3
-	THEN	reduce by rule 3
+	RPAREN	reduce by rule 6
+	DIV	reduce by rule 6
+	MUL	reduce by rule 6
+	ADD	reduce by rule 6
+	SUB	reduce by rule 6
+	EOL	reduce by rule 6
+	AND	reduce by rule 6
+	OR	reduce by rule 6
+	LT	reduce by rule 6
+	LEQ	reduce by rule 6
+	GT	reduce by rule 6
+	GEQ	reduce by rule 6
+	NEQ	reduce by rule 6
+	EQ	reduce by rule 6
+	THEN	reduce by rule 6
 
 
 	.	error
@@ -153,20 +162,23 @@ state 9:
 
 state 10:
 
-	exp : NUMBA .  (reduce by rule 2)
+	exp : NUMBA .  (reduce by rule 5)
 
-	RPAREN	reduce by rule 2
-	ADD	reduce by rule 2
-	EOL	reduce by rule 2
-	AND	reduce by rule 2
-	OR	reduce by rule 2
-	LT	reduce by rule 2
-	LEQ	reduce by rule 2
-	GT	reduce by rule 2
-	GEQ	reduce by rule 2
-	NEQ	reduce by rule 2
-	EQ	reduce by rule 2
-	THEN	reduce by rule 2
+	RPAREN	reduce by rule 5
+	DIV	reduce by rule 5
+	MUL	reduce by rule 5
+	ADD	reduce by rule 5
+	SUB	reduce by rule 5
+	EOL	reduce by rule 5
+	AND	reduce by rule 5
+	OR	reduce by rule 5
+	LT	reduce by rule 5
+	LEQ	reduce by rule 5
+	GT	reduce by rule 5
+	GEQ	reduce by rule 5
+	NEQ	reduce by rule 5
+	EQ	reduce by rule 5
+	THEN	reduce by rule 5
 
 
 	.	error
@@ -174,12 +186,12 @@ state 10:
 
 state 11:
 
-	boolExp : TRUE .  (reduce by rule 15)
+	boolExp : TRUE .  (reduce by rule 18)
 
-	RPAREN	reduce by rule 15
-	AND	reduce by rule 15
-	OR	reduce by rule 15
-	THEN	reduce by rule 15
+	RPAREN	reduce by rule 18
+	AND	reduce by rule 18
+	OR	reduce by rule 18
+	THEN	reduce by rule 18
 
 
 	.	error
@@ -187,12 +199,12 @@ state 11:
 
 state 12:
 
-	boolExp : FALSE .  (reduce by rule 16)
+	boolExp : FALSE .  (reduce by rule 19)
 
-	RPAREN	reduce by rule 16
-	AND	reduce by rule 16
-	OR	reduce by rule 16
-	THEN	reduce by rule 16
+	RPAREN	reduce by rule 19
+	AND	reduce by rule 19
+	OR	reduce by rule 19
+	THEN	reduce by rule 19
 
 
 	.	error
@@ -210,8 +222,8 @@ state 13:
 	DECI	shift 9
 	NOT	shift 8
 
-	exp	goto 29
-	boolExp	goto 28
+	exp	goto 32
+	boolExp	goto 31
 
 	.	error
 
@@ -219,11 +231,17 @@ state 13:
 state 14:
 
 	exp : exp . ADD exp 
-	command : PRINT exp .  (reduce by rule 18)
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	command : PRINT exp .  (reduce by rule 25)
 
-	RPAREN	reduce by rule 18
-	ADD	shift 26
-	EOL	reduce by rule 18
+	RPAREN	reduce by rule 25
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
+	EOL	reduce by rule 25
 
 
 	.	error
@@ -237,7 +255,7 @@ state 15:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 30
+	exp	goto 33
 
 	.	error
 
@@ -246,7 +264,7 @@ state 16:
 
 	command : LPAREN command . RPAREN 
 
-	RPAREN	shift 31
+	RPAREN	shift 34
 
 
 	.	error
@@ -254,13 +272,11 @@ state 16:
 
 state 17:
 
-	command : IF boolExp THEN . command EOL ELSE command EOL FI 
+	command : IF boolExp THEN . commandSeq ELSE commandSeq FI 
 
-	LPAREN	shift 4
-	PRINT	shift 3
-	IF	shift 2
+	LBRACE	shift 36
 
-	command	goto 32
+	commandSeq	goto 35
 
 	.	error
 
@@ -277,7 +293,7 @@ state 18:
 	NOT	shift 8
 
 	exp	goto 7
-	boolExp	goto 33
+	boolExp	goto 37
 
 	.	error
 
@@ -294,7 +310,7 @@ state 19:
 	NOT	shift 8
 
 	exp	goto 7
-	boolExp	goto 34
+	boolExp	goto 38
 
 	.	error
 
@@ -307,7 +323,7 @@ state 20:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 35
+	exp	goto 39
 
 	.	error
 
@@ -320,7 +336,7 @@ state 21:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 36
+	exp	goto 40
 
 	.	error
 
@@ -333,7 +349,7 @@ state 22:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 37
+	exp	goto 41
 
 	.	error
 
@@ -346,7 +362,7 @@ state 23:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 38
+	exp	goto 42
 
 	.	error
 
@@ -359,7 +375,7 @@ state 24:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 39
+	exp	goto 43
 
 	.	error
 
@@ -372,12 +388,25 @@ state 25:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 40
+	exp	goto 44
 
 	.	error
 
 
 state 26:
+
+	exp : exp SUB . exp 
+
+	LPAREN	shift 15
+	NUMBA	shift 10
+	DECI	shift 9
+
+	exp	goto 45
+
+	.	error
+
+
+state 27:
 
 	exp : exp ADD . exp 
 
@@ -385,33 +414,59 @@ state 26:
 	NUMBA	shift 10
 	DECI	shift 9
 
-	exp	goto 41
-
-	.	error
-
-
-state 27:
-
-	boolExp : boolExp . AND boolExp 
-	boolExp : boolExp . OR boolExp 
-	boolExp : NOT boolExp .  (reduce by rule 7)
-
-	RPAREN	reduce by rule 7
-	AND	reduce by rule 7
-	OR	reduce by rule 7
-	THEN	reduce by rule 7
-
+	exp	goto 46
 
 	.	error
 
 
 state 28:
 
+	exp : exp MUL . exp 
+
+	LPAREN	shift 15
+	NUMBA	shift 10
+	DECI	shift 9
+
+	exp	goto 47
+
+	.	error
+
+
+state 29:
+
+	exp : exp DIV . exp 
+
+	LPAREN	shift 15
+	NUMBA	shift 10
+	DECI	shift 9
+
+	exp	goto 48
+
+	.	error
+
+
+state 30:
+
+	boolExp : boolExp . AND boolExp 
+	boolExp : boolExp . OR boolExp 
+	boolExp : NOT boolExp .  (reduce by rule 10)
+
+	RPAREN	reduce by rule 10
+	AND	shift 19
+	OR	shift 18
+	THEN	reduce by rule 10
+
+
+	.	error
+
+
+state 31:
+
 	boolExp : boolExp . AND boolExp 
 	boolExp : boolExp . OR boolExp 
 	boolExp : LPAREN boolExp . RPAREN 
 
-	RPAREN	shift 42
+	RPAREN	shift 49
 	AND	shift 19
 	OR	shift 18
 
@@ -419,9 +474,12 @@ state 28:
 	.	error
 
 
-state 29:
+state 32:
 
 	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
 	exp : LPAREN exp . RPAREN 
 	boolExp : exp . EQ exp 
 	boolExp : exp . NEQ exp 
@@ -430,8 +488,11 @@ state 29:
 	boolExp : exp . GT exp 
 	boolExp : exp . GEQ exp 
 
-	RPAREN	shift 43
-	ADD	shift 26
+	RPAREN	shift 50
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
 	LT	shift 25
 	LEQ	shift 24
 	GT	shift 23
@@ -443,49 +504,19 @@ state 29:
 	.	error
 
 
-state 30:
-
-	exp : exp . ADD exp 
-	exp : LPAREN exp . RPAREN 
-
-	RPAREN	shift 43
-	ADD	shift 26
-
-
-	.	error
-
-
-state 31:
-
-	command : LPAREN command RPAREN .  (reduce by rule 19)
-
-	RPAREN	reduce by rule 19
-	EOL	reduce by rule 19
-
-
-	.	error
-
-
-state 32:
-
-	command : IF boolExp THEN command . EOL ELSE command EOL FI 
-
-	EOL	shift 44
-
-
-	.	error
-
-
 state 33:
 
-	boolExp : boolExp . AND boolExp 
-	boolExp : boolExp . OR boolExp 
-	boolExp : boolExp OR boolExp .  (reduce by rule 6)
+	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	exp : LPAREN exp . RPAREN 
 
-	RPAREN	reduce by rule 6
-	AND	shift 19
-	OR	reduce by rule 6
-	THEN	reduce by rule 6
+	RPAREN	shift 50
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
 
 
 	.	error
@@ -493,14 +524,10 @@ state 33:
 
 state 34:
 
-	boolExp : boolExp . AND boolExp 
-	boolExp : boolExp AND boolExp .  (reduce by rule 5)
-	boolExp : boolExp . OR boolExp 
+	command : LPAREN command RPAREN .  (reduce by rule 26)
 
-	RPAREN	reduce by rule 5
-	AND	reduce by rule 5
-	OR	reduce by rule 5
-	THEN	reduce by rule 5
+	RPAREN	reduce by rule 26
+	EOL	reduce by rule 26
 
 
 	.	error
@@ -508,11 +535,51 @@ state 34:
 
 state 35:
 
-	exp : exp . ADD exp 
-	boolExp : exp EQ exp .  (reduce by rule 8)
+	command : IF boolExp THEN commandSeq . ELSE commandSeq FI 
+
+	ELSE	shift 51
+
+
+	.	error
+
+
+state 36:
+
+	commandSeq : LBRACE . command EOL comSeqInBrace RBRACE 
+	commandSeq : LBRACE . RBRACE 
+
+	LPAREN	shift 4
+	RBRACE	shift 53
+	PRINT	shift 3
+	IF	shift 2
+
+	command	goto 52
+
+	.	error
+
+
+state 37:
+
+	boolExp : boolExp . AND boolExp 
+	boolExp : boolExp . OR boolExp 
+	boolExp : boolExp OR boolExp .  (reduce by rule 9)
+
+	RPAREN	reduce by rule 9
+	AND	shift 19
+	OR	reduce by rule 9
+	THEN	reduce by rule 9
+
+
+	.	error
+
+
+state 38:
+
+	boolExp : boolExp . AND boolExp 
+	boolExp : boolExp AND boolExp .  (reduce by rule 8)
+	boolExp : boolExp . OR boolExp 
 
 	RPAREN	reduce by rule 8
-	ADD	shift 26
 	AND	reduce by rule 8
 	OR	reduce by rule 8
 	THEN	reduce by rule 8
@@ -521,58 +588,19 @@ state 35:
 	.	error
 
 
-state 36:
-
-	exp : exp . ADD exp 
-	boolExp : exp NEQ exp .  (reduce by rule 9)
-
-	RPAREN	reduce by rule 9
-	ADD	shift 26
-	AND	reduce by rule 9
-	OR	reduce by rule 9
-	THEN	reduce by rule 9
-
-
-	.	error
-
-
-state 37:
-
-	exp : exp . ADD exp 
-	boolExp : exp GEQ exp .  (reduce by rule 13)
-
-	RPAREN	reduce by rule 13
-	ADD	shift 26
-	AND	reduce by rule 13
-	OR	reduce by rule 13
-	THEN	reduce by rule 13
-
-
-	.	error
-
-
-state 38:
-
-	exp : exp . ADD exp 
-	boolExp : exp GT exp .  (reduce by rule 12)
-
-	RPAREN	reduce by rule 12
-	ADD	shift 26
-	AND	reduce by rule 12
-	OR	reduce by rule 12
-	THEN	reduce by rule 12
-
-
-	.	error
-
-
 state 39:
 
 	exp : exp . ADD exp 
-	boolExp : exp LEQ exp .  (reduce by rule 11)
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	boolExp : exp EQ exp .  (reduce by rule 11)
 
 	RPAREN	reduce by rule 11
-	ADD	shift 26
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
 	AND	reduce by rule 11
 	OR	reduce by rule 11
 	THEN	reduce by rule 11
@@ -584,13 +612,19 @@ state 39:
 state 40:
 
 	exp : exp . ADD exp 
-	boolExp : exp LT exp .  (reduce by rule 10)
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	boolExp : exp NEQ exp .  (reduce by rule 12)
 
-	RPAREN	reduce by rule 10
-	ADD	shift 26
-	AND	reduce by rule 10
-	OR	reduce by rule 10
-	THEN	reduce by rule 10
+	RPAREN	reduce by rule 12
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
+	AND	reduce by rule 12
+	OR	reduce by rule 12
+	THEN	reduce by rule 12
 
 
 	.	error
@@ -599,10 +633,128 @@ state 40:
 state 41:
 
 	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	boolExp : exp GEQ exp .  (reduce by rule 16)
+
+	RPAREN	reduce by rule 16
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
+	AND	reduce by rule 16
+	OR	reduce by rule 16
+	THEN	reduce by rule 16
+
+
+	.	error
+
+
+state 42:
+
+	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	boolExp : exp GT exp .  (reduce by rule 15)
+
+	RPAREN	reduce by rule 15
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
+	AND	reduce by rule 15
+	OR	reduce by rule 15
+	THEN	reduce by rule 15
+
+
+	.	error
+
+
+state 43:
+
+	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	boolExp : exp LEQ exp .  (reduce by rule 14)
+
+	RPAREN	reduce by rule 14
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
+	AND	reduce by rule 14
+	OR	reduce by rule 14
+	THEN	reduce by rule 14
+
+
+	.	error
+
+
+state 44:
+
+	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	boolExp : exp LT exp .  (reduce by rule 13)
+
+	RPAREN	reduce by rule 13
+	DIV	shift 29
+	MUL	shift 28
+	ADD	shift 27
+	SUB	shift 26
+	AND	reduce by rule 13
+	OR	reduce by rule 13
+	THEN	reduce by rule 13
+
+
+	.	error
+
+
+state 45:
+
+	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp SUB exp .  (reduce by rule 2)
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+
+	RPAREN	reduce by rule 2
+	DIV	shift 29
+	MUL	shift 28
+	ADD	reduce by rule 2
+	SUB	reduce by rule 2
+	EOL	reduce by rule 2
+	AND	reduce by rule 2
+	OR	reduce by rule 2
+	LT	reduce by rule 2
+	LEQ	reduce by rule 2
+	GT	reduce by rule 2
+	GEQ	reduce by rule 2
+	NEQ	reduce by rule 2
+	EQ	reduce by rule 2
+	THEN	reduce by rule 2
+
+
+	.	error
+
+
+state 46:
+
+	exp : exp . ADD exp 
 	exp : exp ADD exp .  (reduce by rule 1)
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
 
 	RPAREN	reduce by rule 1
+	DIV	shift 29
+	MUL	shift 28
 	ADD	reduce by rule 1
+	SUB	reduce by rule 1
 	EOL	reduce by rule 1
 	AND	reduce by rule 1
 	OR	reduce by rule 1
@@ -618,25 +770,47 @@ state 41:
 	.	error
 
 
-state 42:
+state 47:
 
-	boolExp : LPAREN boolExp RPAREN .  (reduce by rule 14)
+	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp MUL exp .  (reduce by rule 3)
+	exp : exp . DIV exp 
 
-	RPAREN	reduce by rule 14
-	AND	reduce by rule 14
-	OR	reduce by rule 14
-	THEN	reduce by rule 14
+	RPAREN	reduce by rule 3
+	DIV	reduce by rule 3
+	MUL	reduce by rule 3
+	ADD	reduce by rule 3
+	SUB	reduce by rule 3
+	EOL	reduce by rule 3
+	AND	reduce by rule 3
+	OR	reduce by rule 3
+	LT	reduce by rule 3
+	LEQ	reduce by rule 3
+	GT	reduce by rule 3
+	GEQ	reduce by rule 3
+	NEQ	reduce by rule 3
+	EQ	reduce by rule 3
+	THEN	reduce by rule 3
 
 
 	.	error
 
 
-state 43:
+state 48:
 
-	exp : LPAREN exp RPAREN .  (reduce by rule 4)
+	exp : exp . ADD exp 
+	exp : exp . SUB exp 
+	exp : exp . MUL exp 
+	exp : exp . DIV exp 
+	exp : exp DIV exp .  (reduce by rule 4)
 
 	RPAREN	reduce by rule 4
+	DIV	reduce by rule 4
+	MUL	reduce by rule 4
 	ADD	reduce by rule 4
+	SUB	reduce by rule 4
 	EOL	reduce by rule 4
 	AND	reduce by rule 4
 	OR	reduce by rule 4
@@ -652,61 +826,168 @@ state 43:
 	.	error
 
 
-state 44:
+state 49:
 
-	command : IF boolExp THEN command EOL . ELSE command EOL FI 
+	boolExp : LPAREN boolExp RPAREN .  (reduce by rule 17)
 
-	ELSE	shift 45
+	RPAREN	reduce by rule 17
+	AND	reduce by rule 17
+	OR	reduce by rule 17
+	THEN	reduce by rule 17
 
 
 	.	error
 
 
-state 45:
+state 50:
 
-	command : IF boolExp THEN command EOL ELSE . command EOL FI 
+	exp : LPAREN exp RPAREN .  (reduce by rule 7)
+
+	RPAREN	reduce by rule 7
+	DIV	reduce by rule 7
+	MUL	reduce by rule 7
+	ADD	reduce by rule 7
+	SUB	reduce by rule 7
+	EOL	reduce by rule 7
+	AND	reduce by rule 7
+	OR	reduce by rule 7
+	LT	reduce by rule 7
+	LEQ	reduce by rule 7
+	GT	reduce by rule 7
+	GEQ	reduce by rule 7
+	NEQ	reduce by rule 7
+	EQ	reduce by rule 7
+	THEN	reduce by rule 7
+
+
+	.	error
+
+
+state 51:
+
+	command : IF boolExp THEN commandSeq ELSE . commandSeq FI 
+
+	LBRACE	shift 36
+
+	commandSeq	goto 54
+
+	.	error
+
+
+state 52:
+
+	commandSeq : LBRACE command . EOL comSeqInBrace RBRACE 
+
+	EOL	shift 55
+
+
+	.	error
+
+
+state 53:
+
+	commandSeq : LBRACE RBRACE .  (reduce by rule 21)
+
+	ELSE	reduce by rule 21
+	FI	reduce by rule 21
+
+
+	.	error
+
+
+state 54:
+
+	command : IF boolExp THEN commandSeq ELSE commandSeq . FI 
+
+	FI	shift 56
+
+
+	.	error
+
+
+state 55:
+
+	commandSeq : LBRACE command EOL . comSeqInBrace RBRACE 
 
 	LPAREN	shift 4
+	RBRACE	reduce by rule 23
 	PRINT	shift 3
 	IF	shift 2
 
-	command	goto 46
+	command	goto 58
+	comSeqInBrace	goto 57
 
 	.	error
 
 
-state 46:
+state 56:
 
-	command : IF boolExp THEN command EOL ELSE command . EOL FI 
+	command : IF boolExp THEN commandSeq ELSE commandSeq FI .  (reduce by rule 24)
 
-	EOL	shift 47
-
-
-	.	error
-
-
-state 47:
-
-	command : IF boolExp THEN command EOL ELSE command EOL . FI 
-
-	FI	shift 48
+	RPAREN	reduce by rule 24
+	EOL	reduce by rule 24
 
 
 	.	error
 
 
-state 48:
+state 57:
 
-	command : IF boolExp THEN command EOL ELSE command EOL FI .  (reduce by rule 17)
+	commandSeq : LBRACE command EOL comSeqInBrace . RBRACE 
 
-	RPAREN	reduce by rule 17
-	EOL	reduce by rule 17
+	RBRACE	shift 59
 
 
 	.	error
 
 
-state 49:
+state 58:
+
+	comSeqInBrace : command . EOL comSeqInBrace 
+
+	EOL	shift 60
+
+
+	.	error
+
+
+state 59:
+
+	commandSeq : LBRACE command EOL comSeqInBrace RBRACE .  (reduce by rule 20)
+
+	ELSE	reduce by rule 20
+	FI	reduce by rule 20
+
+
+	.	error
+
+
+state 60:
+
+	comSeqInBrace : command EOL . comSeqInBrace 
+
+	LPAREN	shift 4
+	RBRACE	reduce by rule 23
+	PRINT	shift 3
+	IF	shift 2
+
+	command	goto 58
+	comSeqInBrace	goto 61
+
+	.	error
+
+
+state 61:
+
+	comSeqInBrace : command EOL comSeqInBrace .  (reduce by rule 22)
+
+	RBRACE	reduce by rule 22
+
+
+	.	error
+
+
+state 62:
 
 
 	EOL	accept
@@ -715,5 +996,5 @@ state 49:
 
 	.	error
 
-154 of 261 action table entries left after compaction
-24 goto table entries
+256 of 384 action table entries left after compaction
+32 goto table entries

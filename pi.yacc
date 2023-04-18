@@ -9,7 +9,7 @@ open DataTypes
 | IF | THEN | ELSE | FI
 
 %nonterm exp of EXP  
-| Program | Block | command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSequence of COMMAND list  
+| Program | Block | command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
 
 
 %pos int
@@ -22,6 +22,9 @@ open DataTypes
 %arg (fileName) : string
 %start Program
 
+%nonassoc EQ
+%nonassoc LT LEQ GT GEQ NEQ
+%nonassoc NOT
 %left IF THEN ELSE FI
 %left OR
 %left AND 
@@ -29,9 +32,6 @@ open DataTypes
 %left ADD SUB RATADD RATSUB
 %left DIV MUL RATMUL RATDIV MOD
 %left LPAREN RPAREN EOL
-%nonassoc EQ
-%nonassoc NOT
-%nonassoc LT LEQ GT GEQ NEQ
 %left LBRACE RBRACE
 
 
@@ -39,6 +39,14 @@ open DataTypes
 Program: command EOL (runCMD(command))
 
 exp : exp ADD exp (add(exp1, exp2))
+    | exp SUB exp (sub(exp1, exp2))
+    | exp MUL exp (mul(exp1, exp2))
+    | exp DIV exp (divOp(exp1, exp2))
+        (*| exp RATADD exp (ratAdd(exp1, exp2))
+        | exp RATSUB exp (ratSub(exp1, exp2))
+        | exp RATMUL exp (ratMul(exp1, exp2))
+        | exp RATDIV exp (ratDiv(exp1, exp2))
+        | exp MOD exp (mod(exp1, exp2))*)
     | NUMBA  (rat(valOf(Rational.make_rat(BigInt.getBigInt(NUMBA), BigInt.getBigInt("1")))))
     | DECI   (rat(Rational.fromDecimal(DECI)))
     | LPAREN exp RPAREN (exp)
@@ -64,9 +72,13 @@ boolExp: boolExp AND boolExp (andOp(boolExp1, boolExp2))
         commandSequence : command EOL commandSequence (command :: commandSequence1)
                         | command EOL ([command])
                         |   ([])*)
+commandSeq : LBRACE command EOL comSeqInBrace RBRACE (cons(command,comSeqInBrace))
+            |   LBRACE RBRACE (empty)
 
+comSeqInBrace : command EOL comSeqInBrace (cons(command, comSeqInBrace))
+           |    (empty)
 
-command : IF boolExp THEN command EOL ELSE command EOL FI (ConditionalCMD(boolExp, command1, command2))
+command : IF boolExp THEN commandSeq ELSE commandSeq FI (ConditionalCMD(boolExp, commandSeq1, commandSeq2))
 |   PRINT exp (PrintCMD(exp))
 |   LPAREN command RPAREN (command)
 

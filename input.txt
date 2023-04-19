@@ -1,0 +1,19 @@
+{
+    if(0000 = 0) then 
+    {
+        print(44);
+        if(10 > 33) then 
+        {
+            print(45);
+        }
+        else
+        {
+            print(33);
+        } fi;
+    } 
+    else 
+    {
+        print(32);
+    } fi;
+    print(100);
+}

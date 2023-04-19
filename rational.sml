@@ -100,6 +100,9 @@ exception unknownCharacter
 fun leq([],[]) = 2
     |   leq([],y) = 1
     |   leq(x, []) = 0 (*leq*)
+    |   leq(#"~"::a, #"~"::b) = leq(b,a) (*if both are negative then the sign is flipped*)
+    |   leq(#"~"::a, b) = if(stripZeros(b)=[#"0"] andalso stripZeros(a)=[#"0"]) then 2 else 1 (*if both are 0 then equal, else negative is smaller*)
+    |   leq(a, #"~"::b) = if(stripZeros(b)=[#"0"] andalso stripZeros(a)=[#"0"]) then 2 else 0 (*if both are 0 then equal, else positive is greater*)
     |   leq(x,y) = let
             val x = implode (stripZeros( x));
             val y = implode (stripZeros( y)); (*removes the leading 0's while comparing*)

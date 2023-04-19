@@ -5,11 +5,12 @@ open DataTypes
 %term ID of string | LPAREN | RPAREN | DIV | MUL | ADD | SUB | MOD | LBRACE | RBRACE
 | RATADD | RATSUB | RATMUL | RATDIV | FALSE | TRUE
 | NUMBA of string | DISPLAY | EOL | EOF | DECI of string | SHOWDECIMAL | PRINT | READ 
-| AND | OR | NOT | LT | LEQ | GT | GEQ | NEQ | EQ
-| IF | THEN | ELSE | FI
+| AND | OR | NOT | LT | LEQ | GT | GEQ | NEQ | EQ 
+| IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN
 
 %nonterm exp of EXP  
 | Program | Block | command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
+| VarDecls | RatVarDecls | IntVarDecls | BoolVarDecls 
 
 
 %pos int
@@ -36,7 +37,8 @@ open DataTypes
 
 
 %%
-Program: command EOL (runCMD(command))
+Program: commandSeq (runCMDSeq(commandSeq))
+    (*Block :*)
 
 exp : exp ADD exp (int(add(exp1, exp2)))
     | exp RATADD exp (rat(add(exp1, exp2)))

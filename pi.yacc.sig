@@ -2,6 +2,9 @@ signature Pi_TOKENS =
 sig
 type ('a,'b) token
 type svalue
+val BOOLEAN:  'a * 'a -> (svalue,'a) token
+val INTEGER:  'a * 'a -> (svalue,'a) token
+val RATIONAL:  'a * 'a -> (svalue,'a) token
 val FI:  'a * 'a -> (svalue,'a) token
 val ELSE:  'a * 'a -> (svalue,'a) token
 val THEN:  'a * 'a -> (svalue,'a) token

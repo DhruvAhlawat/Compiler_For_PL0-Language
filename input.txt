@@ -1,5 +1,12 @@
 rational a,b,c,d; 
 integer b,c,d,e;
+procedure B
+    rational c,d,e;
+    integer b,c,d;
+    boolean dsasdf,dafa,sadfasf;
+    {
+        
+    };
 {
-
+    
 }

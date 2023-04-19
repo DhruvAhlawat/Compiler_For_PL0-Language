@@ -24,7 +24,7 @@ struct
     datatype VARDEC = boolean of string | rational of string | integer of string
     type VARDECSEC = VARDEC list
 
-    datatype BLOCK = block of DECSEQ * COMMANDSEQ
+    datatype BLOCK = block of DECSEQ * COMMANDSEQ 
     and DECSEQ = decSeq of VARDECSEC * PROCDECLS 
     and PROCDECLS =  emptyDec | procDecls of PROCDEF * PROCDECLS 
     and PROCDEF = procDef of string * BLOCK

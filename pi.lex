@@ -9,7 +9,7 @@ type lexarg = string
 type arg = lexarg
 val lin = ref 1;
 val col = ref 0; (*lin and col are not really used, hence not updated*)
-val eof = fn fileName => T.EOL (!lin,!col);
+val eof = fn fileName => T.EOF (!lin,!col);
 
 fun containsDecimal(x:string) =
     let
@@ -29,7 +29,7 @@ fun containsDecimal(x:string) =
 alpha = [A-Za-z];
 num = [0-9.~()];
 integer=[~]?[0-9]+;
-deci = [~]?[0-9]*\.[0-9]+ | [~]?[0-9]*\.[0-9]*([0-9]+);
+deci = [~]?[0-9]*\.[0-9]+ | [~]?[0-9]*\.[0-9]*\([0-9]+\);
 alphanum = [0-9a-zA-Z];
 spaces = [\ \t];
 %%

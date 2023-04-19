@@ -1,1 +1,1 @@
-if (47 > 46) then {print(45*2); print(10);} else {print(22); print(19);} fi;
+print(3.3(333333) <> 3.3(3)); 

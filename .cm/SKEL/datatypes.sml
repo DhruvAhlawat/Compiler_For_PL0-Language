@@ -1,2 +1,2 @@
 Skeleton 5
-d2f1d"Rational"ad"DataTypes"h0
+d2f3d"Bool"d"Rational"d"BigInt"ad"DataTypes"h0

@@ -10,6 +10,16 @@ structure Header =
 struct
 open DataTypes
 
+val scopeNumber = ref ~1;
+
+fun printScopeNumbers(block(a,b,c)) = 
+    let
+        fun psn([]) = ()
+        |   psn(x::xs) = (print(Int.toString(x)^"\n"); psn(xs));
+    in
+        psn(c)
+    end;
+
 
 end
 structure LrTable = Token.LrTable
@@ -497,9 +507,9 @@ fn (i392,defaultPos,stack,
     (fileName):arg) =>
 case (i392,stack)
 of  ( 0, ( ( _, ( MlyValue.Block Block1, Block1left, Block1right)) :: 
-rest671)) => let val  result = MlyValue.ntVOID (fn _ => ( let val  
-Block1 = Block1 ()
- in ()
+rest671)) => let val  result = MlyValue.ntVOID (fn _ => ( let val  (
+Block as Block1) = Block1 ()
+ in (scopeNumber := ~1; printScopeNumbers(Block))
 end; ()))
  in ( LrTable.NT 1, ( result, Block1left, Block1right), rest671)
 end
@@ -509,7 +519,9 @@ DeclarationSeq1left, _)) :: rest671)) => let val  result =
 MlyValue.Block (fn _ => let val  (DeclarationSeq as DeclarationSeq1) =
  DeclarationSeq1 ()
  val  (commandSeq as commandSeq1) = commandSeq1 ()
- in (block(DeclarationSeq, commandSeq))
+ in (
+scopeNumber := !scopeNumber + 1; block(DeclarationSeq, commandSeq, !scopeNumber:: getChildrenScopes(DeclarationSeq))
+)
 end)
  in ( LrTable.NT 2, ( result, DeclarationSeq1left, commandSeq1right), 
 rest671)

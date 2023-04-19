@@ -1,5 +1,15 @@
 open DataTypes
 
+val scopeNumber = ref ~1;
+
+fun printScopeNumbers(block(a,b,c)) = 
+    let
+        fun psn([]) = ()
+        |   psn(x::xs) = (print(Int.toString(x)^"\n"); psn(xs));
+    in
+        psn(c)
+    end;
+
 %%
 %name Pi
 %term LPAREN | RPAREN | DIV | MUL | ADD | SUB | MOD | LBRACE | RBRACE | IDENT of string 
@@ -40,9 +50,10 @@ open DataTypes
 
 %%
     (*Program: commandSeq (runCMDSeq(commandSeq))*)
-Program : Block ()
+Program : Block (scopeNumber := ~1; printScopeNumbers(Block))
 
-Block : DeclarationSeq commandSeq (block(DeclarationSeq, commandSeq)) 
+Block : DeclarationSeq commandSeq (scopeNumber := !scopeNumber + 1; block(DeclarationSeq, commandSeq, !scopeNumber:: getChildrenScopes(DeclarationSeq)))
+     
 
 DeclarationSeq : VarDecls ProcDecls (decSeq(VarDecls, ProcDecls)) 
 

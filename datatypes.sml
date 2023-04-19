@@ -24,11 +24,28 @@ struct
     datatype VARDEC = boolean of string | rational of string | integer of string
     type VARDECSEC = VARDEC list
 
-    datatype BLOCK = block of DECSEQ * COMMANDSEQ 
+    datatype BLOCK = block of DECSEQ * COMMANDSEQ * int list (*the int list is for the list of children nodes*)
     and DECSEQ = decSeq of VARDECSEC * PROCDECLS 
     and PROCDECLS =  emptyDec | procDecls of PROCDEF * PROCDECLS 
-    and PROCDEF = procDef of string * BLOCK
+    and PROCDEF = procDef of string * BLOCK 
 
+    (*this is used when declaring the scopes*)
+    fun getChildrenScopes(decSeq(d,e)) = 
+    let
+        fun helper(emptyDec) = []
+        |   helper(procDecls(procDef(f,block(a,b,c)),h))  = c@(helper(h))
+    in
+        (helper(e))
+    end
+
+    (* fun getChildrenScopes(decSeq(d,e)) = 
+    let
+        fun helper(emptyDec) = []
+        |   helper(procDecls(procDef(f,g),h))  = (getChildrenScopes(g))@(helper(h))
+    in
+        c@(helper(e))
+    end *)
+        
     exception typeMismatched;
     exception divisionByZeroError;
     

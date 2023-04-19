@@ -2,15 +2,17 @@ open DataTypes
 
 %%
 %name Pi
-%term ID of string | LPAREN | RPAREN | DIV | MUL | ADD | SUB | MOD | LBRACE | RBRACE
+%term LPAREN | RPAREN | DIV | MUL | ADD | SUB | MOD | LBRACE | RBRACE | IDENT of string 
 | RATADD | RATSUB | RATMUL | RATDIV | FALSE | TRUE
 | NUMBA of string | DISPLAY | EOL | EOF | DECI of string | SHOWDECIMAL | PRINT | READ 
 | AND | OR | NOT | LT | LEQ | GT | GEQ | NEQ | EQ 
-| IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN
+| IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE
 
 %nonterm exp of EXP  
-| Program | Block | command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
-| VarDecls | RatVarDecls | IntVarDecls | BoolVarDecls 
+| Program | Block of BLOCK| command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
+| VarDecls of VARDECSEC | RatVarDecls of VARDECSEC | IntVarDecls of VARDECSEC  | BoolVarDecls of VARDECSEC 
+| RatIDlist of VARDECSEC | IntIDlist of VARDECSEC | BoolIDlist of VARDECSEC
+| ProcDecls of PROCDECLS | ProcDef of PROCDEF| DeclarationSeq of DECSEQ
 
 
 %pos int
@@ -37,8 +39,32 @@ open DataTypes
 
 
 %%
-Program: commandSeq (runCMDSeq(commandSeq))
-    (*Block :*)
+    (*Program: commandSeq (runCMDSeq(commandSeq))*)
+Program : Block ()
+
+Block : DeclarationSeq commandSeq (block(DeclarationSeq, commandSeq)) 
+
+DeclarationSeq : VarDecls ProcDecls (decSeq(VarDecls, ProcDecls)) 
+
+ProcDecls : ProcDef EOL ProcDecls (procDecls(ProcDef, ProcDecls))
+        | (emptyDec)
+ProcDef : PROCEDURE IDENT Block ( procDef(IDENT,Block) )
+
+VarDecls : RatVarDecls IntVarDecls BoolVarDecls (RatVarDecls @ IntVarDecls @ BoolVarDecls) 
+
+RatVarDecls : RATIONAL IDENT RatIDlist EOL(rational(IDENT1) :: RatIDlist)
+|   ([])
+IntVarDecls : INTEGER IDENT IntIDlist EOL(integer(IDENT1) :: IntIDlist)
+|   ([])
+BoolVarDecls : BOOLEAN IDENT BoolIDlist EOL (boolean(IDENT1) :: BoolIDlist)
+|   ([])
+BoolIDlist : COMMA IDENT BoolIDlist (boolean(IDENT1) :: BoolIDlist)
+| ([])
+RatIDlist : COMMA IDENT RatIDlist (rational(IDENT1) :: RatIDlist)
+| ([])
+IntIDlist : COMMA IDENT IntIDlist (integer(IDENT1) :: IntIDlist)
+| ([])
+
 
 exp : exp ADD exp (int(add(exp1, exp2)))
     | exp RATADD exp (rat(add(exp1, exp2)))
@@ -95,7 +121,7 @@ comSeqInBrace : command EOL comSeqInBrace (cons(command, comSeqInBrace))
            |    (empty)
 
 command : IF boolExp THEN commandSeq ELSE commandSeq FI (ConditionalCMD(boolExp, commandSeq1, commandSeq2))
-|   PRINT LPAREN exp RPAREN (PrintCMD(exp))
-|   PRINT LPAREN boolExp RPAREN(PrintBool(boolExp))
-|   LPAREN command RPAREN (command)
+    |   PRINT LPAREN exp RPAREN (PrintCMD(exp))
+    |   PRINT LPAREN boolExp RPAREN(PrintBool(boolExp))
+    |   LPAREN command RPAREN (command)
 

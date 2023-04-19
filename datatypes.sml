@@ -17,9 +17,17 @@ struct
     datatype COMMANDSEQ = empty | cons of COMMAND * COMMANDSEQ
     and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ | PrintBool of BOOLEXP
 
-    datatype curType = INT | RAT 
-                                 
-    type EXPtyped = (EXP * curType)
+    (* type PROCDEF = string*COMMANDSEQ *)
+
+    (* datatype curType = integer | rational | boolean  *)
+    
+    datatype VARDEC = boolean of string | rational of string | integer of string
+    type VARDECSEC = VARDEC list
+
+    datatype BLOCK = block of DECSEQ * COMMANDSEQ
+    and DECSEQ = decSeq of VARDECSEC * PROCDECLS 
+    and PROCDECLS =  emptyDec | procDecls of PROCDEF * PROCDECLS 
+    and PROCDEF = procDef of string * BLOCK
 
     exception typeMismatched;
     exception divisionByZeroError;

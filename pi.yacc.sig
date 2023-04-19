@@ -2,6 +2,8 @@ signature Pi_TOKENS =
 sig
 type ('a,'b) token
 type svalue
+val PROCEDURE:  'a * 'a -> (svalue,'a) token
+val COMMA:  'a * 'a -> (svalue,'a) token
 val BOOLEAN:  'a * 'a -> (svalue,'a) token
 val INTEGER:  'a * 'a -> (svalue,'a) token
 val RATIONAL:  'a * 'a -> (svalue,'a) token
@@ -32,6 +34,7 @@ val RATDIV:  'a * 'a -> (svalue,'a) token
 val RATMUL:  'a * 'a -> (svalue,'a) token
 val RATSUB:  'a * 'a -> (svalue,'a) token
 val RATADD:  'a * 'a -> (svalue,'a) token
+val IDENT: (string) *  'a * 'a -> (svalue,'a) token
 val RBRACE:  'a * 'a -> (svalue,'a) token
 val LBRACE:  'a * 'a -> (svalue,'a) token
 val MOD:  'a * 'a -> (svalue,'a) token
@@ -41,7 +44,6 @@ val MUL:  'a * 'a -> (svalue,'a) token
 val DIV:  'a * 'a -> (svalue,'a) token
 val RPAREN:  'a * 'a -> (svalue,'a) token
 val LPAREN:  'a * 'a -> (svalue,'a) token
-val ID: (string) *  'a * 'a -> (svalue,'a) token
 end
 signature Pi_LRVALS=
 sig

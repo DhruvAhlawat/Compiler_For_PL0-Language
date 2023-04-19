@@ -42,7 +42,9 @@ spaces = [\ \t];
 ")" => (T.RPAREN(!lin,!col));
 "{" => (T.LBRACE(!lin,!col));
 "}" => (T.RBRACE(!lin,!col));
+"," => (T.COMMA(!lin,!col));
 
+"procedure" => (T.PROCEDURE(!lin,!col));
 "rational" => (T.RATIONAL(!lin,!col));
 "integer" => (T.INTEGER(!lin,!col));
 "boolean" => (T.BOOLEAN(!lin,!col));
@@ -76,5 +78,5 @@ spaces = [\ \t];
 
 {integer} => (T.NUMBA(yytext,!lin,!col));
 {deci} => (T.DECI(yytext,!lin,!col));
-{alpha}{alphanum}* => (T.ID(yytext,!lin,!col));
+{alpha}{alphanum}* => (T.IDENT(yytext,!lin,!col));
 . => (print("unmatched character typed "^yytext^"\n"); continue());

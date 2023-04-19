@@ -12,7 +12,7 @@ struct
     
     datatype BOOLEXP = eq of EXP*EXP | neq of EXP*EXP | andOp of BOOLEXP*BOOLEXP 
         | orOp of BOOLEXP*BOOLEXP | notOp of BOOLEXP | TRUE | FALSE | lt of EXP * EXP 
-        | gt of EXP * EXP | leq of EXP * EXP | geq of EXP * EXP 
+        | gt of EXP * EXP | leq of EXP * EXP | geq of EXP * EXP | beq of BOOLEXP * BOOLEXP | bneq of BOOLEXP * BOOLEXP;
 
     datatype COMMANDSEQ = empty | cons of COMMAND * COMMANDSEQ
     and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ | PrintBool of BOOLEXP
@@ -84,6 +84,8 @@ struct
         |   evalBool(gt(a,b)) = greaterThan(eval(a),eval(b))
         |   evalBool(leq(a,b)) =  let val A = eval(a); val B = eval(b); in (lessThan(A,B) orelse (A = B)) end
         |   evalBool(geq(a,b)) =  not (lessThan(eval(a),eval(b)))
+        |   evalBool(beq(a,b)) = (evalBool(a) = evalBool(b))
+        |   evalBool(bneq(a,b)) = not (evalBool(a) = evalBool(b))
 
 
     fun runCMD(PrintCMD(a)) = 

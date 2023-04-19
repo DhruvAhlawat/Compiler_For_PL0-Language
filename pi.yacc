@@ -75,6 +75,8 @@ boolExp: boolExp AND boolExp (andOp(boolExp1, boolExp2))
         | LPAREN boolExp RPAREN (boolExp)
         | TRUE (TRUE)
         | FALSE (FALSE)
+        | boolExp EQ boolExp (beq(boolExp1, boolExp2))
+        | boolExp NEQ boolExp (bneq(boolExp1, boolExp2))
 
 
 

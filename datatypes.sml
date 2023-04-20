@@ -1,5 +1,6 @@
 (* use "rational.sml"; *)
-open SymbolTable
+(* open SymbolTable *)
+(* use "symbolTable.sml" *)
 structure DataTypes =
 struct
     datatype EXP= 
@@ -25,22 +26,113 @@ struct
     datatype VARDEC = boolean of string | rational of string | integer of string
     type VARDECSEC = VARDEC list
 
-    datatype BLOCK = block of DECSEQ * COMMANDSEQ * int * int list ref (*the int list is for the list of children nodes*)
+    datatype BLOCK = block of DECSEQ * COMMANDSEQ * int * int list ref (*the int list is for the list of parent nodes*)
     and DECSEQ = decSeq of VARDECSEC * PROCDECLS 
     and PROCDECLS =  emptyDec | procDecls of PROCDEF * PROCDECLS 
     and PROCDEF = procDef of string * BLOCK 
+
+        type VarSymbol = EXP * int(*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
+    type ProcSymbol = PROCDEF * int (*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
+
+    exception VariableNotDeclared;
+    exception VarIncorrectTypeOrNotDeclared;
+    val varMap : (string, VarSymbol list) HashTable.hash_table = HashTable.mkTable(HashString.hashString, op=)(50, Fail "not declared")
+    val procMap : (string, ProcSymbol list) HashTable.hash_table = HashTable.mkTable(HashString.hashString, op=)(50, Fail "not declared")
+
+    fun declareProc (name:string, proc:PROCDEF, scope:int) = 
+        let
+            val procList = 
+            case HashTable.find procMap name of
+                NONE => []
+                | SOME l => l
+        in
+            HashTable.insert procMap  (name, ((proc, scope):ProcSymbol )::procList)
+        end
+
+
+    fun declareVar (name:string, exp:EXP, scope:int) = 
+        let
+            val varList = 
+            case HashTable.find varMap name of
+                NONE => []
+                | SOME l => l
+        in
+            HashTable.insert varMap  (name, (exp, scope)::varList)
+        end
+
+    (*This function removes the previous instance of the variable in the symbol table so we can append the new value to it*)
+    fun findAndRemovePreviousVarValue(a, b) = 
+        let 
+            fun findMatchingScope(((b,a):VarSymbol):: t, L , reqScope:int) = if(reqScope = a) then SOME((L@t, b))
+            else
+                findMatchingScope(t, (b,a) :: L, reqScope)
+            |   findMatchingScope([], L, reqScope) = NONE
+        in
+            findMatchingScope(a, [], b)
+        end
+
+   
+    
+    fun getVarVal(name:string, scopes:int list) = 
+        let
+            val varList = HashTable.lookup varMap name;
+            fun getVarExp(a, b) = 
+                let 
+                    fun findMatchingScope(((b,a):VarSymbol):: t, reqScope:int) = if(reqScope = a) then SOME(b)
+                    else
+                        findMatchingScope(t, reqScope)
+                    |   findMatchingScope([], reqScope) = NONE
+                in
+                    findMatchingScope(a, b)
+                end
+            fun checkAllScopes([]) = raise VariableNotDeclared
+            |   checkAllScopes((scope::t)) = 
+                case getVarExp(varList, scope) of
+                    NONE => checkAllScopes(t)
+                    | SOME exp => exp
+        in
+            checkAllScopes(scopes)
+        end
+
+
+    fun assignVar (name:string, exp:EXP, scopes :int list) =
+        let
+            val varList = HashTable.lookup varMap name; (*returns an exception if the variable has not been declared*)
+            fun checkAllScopes([]) = raise VariableNotDeclared
+            |   checkAllScopes((scope::t)) = 
+                case findAndRemovePreviousVarValue(varList, scope) of
+                    NONE => checkAllScopes(t)
+                    | SOME (l, prevExp) => (  case (prevExp, exp) of 
+                            (intType(_), intType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
+                            | (ratType(_), ratType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
+                            | (_,_) => raise   VarIncorrectTypeOrNotDeclared)   
+                            (*if we found a matching scope, then its previous value would have been deleted so we insert a new exp,scope in l and put it in the hashmap*)
+                    
+        in
+            checkAllScopes(scopes)
+        end
 
 
     fun declareVariables(L, scopeNumber) =
     let
         fun helper([]) = ()
-        |   helper(rational(a) :: h) = SymbolTable.declareVar(a, DataTypes.ratType(Rational.fromDecimal("0.0(0)")), scopeNumber)
-        |   helper(integer(a) :: h) = SymbolTable.declareVar(a, DataTypes.intType(BigInt.getBigInt("0")), scopeNumber)
-        |   helper(boolean(a) :: h) = SymbolTable.declareVar(a, DataTypes.boolType(false), scopeNumber)
+        |   helper(rational(a) :: h) = declareVar(a, ratType(Rational.fromDecimal("0.0(0)")), scopeNumber)
+        |   helper(integer(a) :: h) = declareVar(a, intType(BigInt.getBigInt("0")), scopeNumber)
+        |   helper(boolean(a) :: h) = declareVar(a, boolType(false), scopeNumber)
     in
         helper(L)
     end;
     
+    (* fun declareProcedures(emptyDec, scopeNumber) = () (*do nothing incase no procedures declared*)
+    |   declareProcedures(procDecls(procDef(f,b),h), scopeNumber) = 
+        (SymbolTable.declareProc(f, procDef(f,b), scopeNumber); declareProcedures(h, scopeNumber)) *)
+
+    fun runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
+        let
+          
+        in
+            (declareVariables(a,curScope))
+        end;
 
 
     fun assignBlockScopes(block(decSeq(_,a),_,curScope,L), parentScopes) = 
@@ -139,10 +231,11 @@ struct
             end
         |   runCMD(PrintBool(a)) = (print(Bool.toString(evalBool(a))); print("\n"))
         |   runCMD(ConditionalCMD(a,b,c)) = if (evalBool(a)) then runCMDSeq(b) else runCMDSeq(c)
-        |   runCMD(AssignCMD(a,b)) = SymbolTable.assignVar()
+        (*|   runCMD(AssignCMD(a,b)) = SymbolTable.assignVar()*)
 
     and runCMDSeq(empty) = ()
         |   runCMDSeq(cons(a,b)) = (runCMD(a); runCMDSeq(b))
 
 
 end;
+

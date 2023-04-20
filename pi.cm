@@ -8,6 +8,7 @@ is
     pi.yacc:MLyacc
     glue.sml
     Compiler.sml
+    $/smlnj-lib.cm
     $/basis.cm (* SML/NJ’s Basis Library. *)
     $/ml-yacc-lib.cm 
     $smlnj/compiler/compiler.cm (* Structure Compiler. *)

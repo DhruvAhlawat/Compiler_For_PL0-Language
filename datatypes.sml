@@ -9,7 +9,7 @@ struct
                 | modOp of EXP * EXP    
                 | int of EXP |  rat of EXP 
                 (* | bool of EXP | eq of EXP*EXP | neq of EXP*EXP | andOp of EXP*EXP | lt of EXP*EXP *)
-                | ID of string | intType of BigInt.bigint | ratType of Rational.rational
+                | var of string | intType of BigInt.bigint | ratType of Rational.rational
                 | STRING of string | CHAR of char | boolType of bool;
     
     datatype BOOLEXP = eq of EXP*EXP | neq of EXP*EXP | andOp of BOOLEXP*BOOLEXP 
@@ -31,7 +31,8 @@ struct
     and PROCDECLS =  emptyDec | procDecls of PROCDEF * PROCDECLS 
     and PROCDEF = procDef of string * BLOCK 
 
-        type VarSymbol = EXP * int(*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
+(*Symbol table stuff*)
+    type VarSymbol = EXP * int(*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
     type ProcSymbol = PROCDEF * int (*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
 
     exception VariableNotDeclared;
@@ -116,23 +117,18 @@ struct
     fun declareVariables(L, scopeNumber) =
     let
         fun helper([]) = ()
-        |   helper(rational(a) :: h) = declareVar(a, ratType(Rational.fromDecimal("0.0(0)")), scopeNumber)
-        |   helper(integer(a) :: h) = declareVar(a, intType(BigInt.getBigInt("0")), scopeNumber)
-        |   helper(boolean(a) :: h) = declareVar(a, boolType(false), scopeNumber)
+        |   helper(rational(a) :: h) = (declareVar(a, ratType(Rational.fromDecimal("0.0(0)")), scopeNumber); helper(h))
+        |   helper(integer(a) :: h) = (declareVar(a, intType(BigInt.getBigInt("0")), scopeNumber); helper(h))
+        |   helper(boolean(a) :: h) = (declareVar(a, boolType(false), scopeNumber); helper(h))
     in
         helper(L)
     end;
     
-    (* fun declareProcedures(emptyDec, scopeNumber) = () (*do nothing incase no procedures declared*)
+    fun declareProcedures(emptyDec, scopeNumber) = () (*do nothing incase no procedures declared*)
     |   declareProcedures(procDecls(procDef(f,b),h), scopeNumber) = 
-        (SymbolTable.declareProc(f, procDef(f,b), scopeNumber); declareProcedures(h, scopeNumber)) *)
+        (declareProc(f, procDef(f,b), scopeNumber); declareProcedures(h, scopeNumber)) 
+(*end of symbolTable Stuff*)
 
-    fun runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
-        let
-          
-        in
-            (declareVariables(a,curScope))
-        end;
 
 
     fun assignBlockScopes(block(decSeq(_,a),_,curScope,L), parentScopes) = 
@@ -186,56 +182,62 @@ struct
         
 
 
-    fun eval((intType a) | int(intType a)) = intType (a)
-        |   eval((ratType a) | rat(ratType a)) = ratType (a)
-        |   eval(int(add(a,b))) = Add(eval(a),eval(b))
-        |   eval(rat(add(a,b))) = ratAdd(eval(a),eval(b))
-        |   eval(rat(sub(a,b))) = ratSub(eval(a),eval(b))
-        |   eval(rat(mul(a,b))) = ratMul(eval(a),eval(b))
-        |   eval(rat(divOp(a,b))) = ratDiv(eval(a),eval(b))
-        |   eval(int(sub(a,b))) = Sub(eval(a),eval(b))
-        |   eval(int(mul(a,b))) = Mul(eval(a),eval(b))
-        |   eval(int(divOp(a,b))) = Div(eval(a),eval(b))
-        |   eval(int(modOp(a,b))) = Mod(eval(a),eval(b))
+    fun eval((intType a, c) | (int(intType a),c)) = intType (a)
+        |   eval((ratType a, c) | (rat(ratType a),c)) = ratType (a)
+        |   eval(int(add(a,b)),c) = Add(eval(a,c),eval(b,c))
+        |   eval(rat(add(a,b)),c) = ratAdd(eval(a,c),eval(b,c))
+        |   eval(rat(sub(a,b)),c) = ratSub(eval(a,c),eval(b,c))
+        |   eval(rat(mul(a,b)),c) = ratMul(eval(a,c),eval(b,c))
+        |   eval(rat(divOp(a,b)),c) = ratDiv(eval(a,c),eval(b,c))
+        |   eval(int(sub(a,b)),c) = Sub(eval(a,c),eval(b,c))
+        |   eval(int(mul(a,b)),c) = Mul(eval(a,c),eval(b,c))
+        |   eval(int(divOp(a,b)),c) = Div(eval(a,c),eval(b,c))
+        |   eval(int(modOp(a,b)),c) = Mod(eval(a,c),eval(b,c))
+        |   eval(var(a),c) = getVarVal(a,c)
         (* |   eval((boolType a) | bool(boolType a)) = boolType (a)
         |   eval(bool(lt(a,b))) = boolType(lessThan(eval(a),eval(b))) *)
     
    
 
-    fun evalBool(TRUE) = true
-        |   evalBool(FALSE) = false
-        |   evalBool(eq(a,b)) =  isEqual(eval(a),eval(b))
-        |   evalBool(neq(a,b)) = not (eval(a) = eval(b))
-        |   evalBool(andOp(a,b)) = (evalBool(a) andalso evalBool(b))
-        |   evalBool(orOp(a,b)) = (evalBool(a) orelse evalBool(b))
-        |   evalBool(notOp(a)) = (not (evalBool(a)))
-        |   evalBool(lt(a,b)) = lessThan(eval(a),eval(b))
-        |   evalBool(gt(a,b)) = greaterThan(eval(a),eval(b))
-        |   evalBool(leq(a,b)) =  let val A = eval(a); val B = eval(b); in (lessThan(A,B) orelse (A = B)) end
-        |   evalBool(geq(a,b)) =  not (lessThan(eval(a),eval(b)))
-        |   evalBool(beq(a,b)) = (evalBool(a) = evalBool(b))
-        |   evalBool(bneq(a,b)) = not (evalBool(a) = evalBool(b))
+    fun evalBool(TRUE,scopes) = true
+        |   evalBool(FALSE,scopes) = false
+        |   evalBool(eq(a,b),scopes) =  isEqual(eval(a,scopes),eval(b,scopes))
+        |   evalBool(neq(a,b),scopes) = not (evalBool(eq(a,b),scopes))
+        |   evalBool(andOp(a,b),scopes) = (evalBool(a,scopes) andalso evalBool(b,scopes))
+        |   evalBool(orOp(a,b),scopes) = (evalBool(a,scopes) orelse evalBool(b,scopes))
+        |   evalBool(notOp(a),scopes) = (not (evalBool(a,scopes)))
+        |   evalBool(lt(a,b),scopes) = lessThan(eval(a,scopes),eval(b,scopes))
+        |   evalBool(gt(a,b),scopes) = greaterThan(eval(a,scopes),eval(b,scopes))
+        |   evalBool(leq(a,b),scopes) =  let val A = eval(a,scopes); val B = eval(b,scopes); in (lessThan(A,B) orelse (A = B)) end
+        |   evalBool(geq(a,b),scopes) =  not (lessThan(eval(a,scopes),eval(b,scopes)))
+        |   evalBool(beq(a,b),scopes) = (evalBool(a, scopes) = evalBool(b, scopes))
+        |   evalBool(bneq(a,b),scopes) = not (evalBool(a, scopes) = evalBool(b, scopes))
 
 
     
     
     
-    fun runCMD(PrintCMD(a)) = 
+    fun runCMD(PrintCMD(a), scopes) = 
         let 
-            val b = eval(a); 
+            val b = eval(a,scopes); 
             fun printHelper(intType(a)) = print(implode (a))
             |   printHelper(ratType(a)) = print(Rational.showRat(a))
             |   printHelper(boolType(a)) = print(Bool.toString(a))
             in 
                 (printHelper(b); print("\n")) (*printing a new line for ease of viewing printed text*) (*perhaps gotta CHANGE since no newline prints were mentioned in assighnment*)
             end
-        |   runCMD(PrintBool(a)) = (print(Bool.toString(evalBool(a))); print("\n"))
-        |   runCMD(ConditionalCMD(a,b,c)) = if (evalBool(a)) then runCMDSeq(b) else runCMDSeq(c)
-        (*|   runCMD(AssignCMD(a,b)) = SymbolTable.assignVar()*)
+        |   runCMD(PrintBool(a), scopes) = (print(Bool.toString(evalBool(a,scopes))); print("\n"))
+        |   runCMD(ConditionalCMD(a,b,c), scopes) = if (evalBool(a, scopes)) then runCMDSeq(b, scopes) else runCMDSeq(c, scopes)
+        |   runCMD(AssignCMD(a,b), scopes) = assignVar(a, eval(b,scopes), scopes)
 
-    and runCMDSeq(empty) = ()
-        |   runCMDSeq(cons(a,b)) = (runCMD(a); runCMDSeq(b))
+    and runCMDSeq(empty, scopes) = ()
+        |   runCMDSeq(cons(a,b), scopes) = (runCMD(a, scopes); runCMDSeq(b, scopes))
 
-
+    fun runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
+        let
+            
+        in
+            (declareVariables(a,curScope); declareProcedures(b,curScope); runCMDSeq(c,curScope::(!parentScopes)))
+        end;
 end;
 

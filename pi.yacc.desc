@@ -9,7 +9,7 @@ state 0:
 	BOOLEAN	reduce by rule 8
 	PROCEDURE	reduce by rule 8
 
-	Program	goto 117
+	Program	goto 118
 	Block	goto 4
 	VarDecls	goto 3
 	RatVarDecls	goto 2
@@ -183,7 +183,8 @@ state 15:
 
 	command : IF . boolExp THEN commandSeq ELSE commandSeq FI 
 
-	LPAREN	shift 35
+	LPAREN	shift 36
+	IDENT	shift 35
 	FALSE	shift 34
 	TRUE	shift 33
 	NUMBA	shift 32
@@ -201,7 +202,7 @@ state 16:
 	command : PRINT . LPAREN exp RPAREN 
 	command : PRINT . LPAREN boolExp RPAREN 
 
-	LPAREN	shift 36
+	LPAREN	shift 37
 
 
 	.	error
@@ -212,7 +213,7 @@ state 17:
 	command : IDENT . ASSIGN exp 
 	command : IDENT . ASSIGN boolExp 
 
-	ASSIGN	shift 37
+	ASSIGN	shift 38
 
 
 	.	error
@@ -220,12 +221,12 @@ state 17:
 
 state 18:
 
-	commandSeq : LBRACE RBRACE .  (reduce by rule 46)
+	commandSeq : LBRACE RBRACE .  (reduce by rule 47)
 
-	EOL	reduce by rule 46
-	EOF	reduce by rule 46
-	ELSE	reduce by rule 46
-	FI	reduce by rule 46
+	EOL	reduce by rule 47
+	EOF	reduce by rule 47
+	ELSE	reduce by rule 47
+	FI	reduce by rule 47
 
 
 	.	error
@@ -240,7 +241,7 @@ state 19:
 	PRINT	shift 16
 	IF	shift 15
 
-	command	goto 38
+	command	goto 39
 
 	.	error
 
@@ -260,7 +261,7 @@ state 21:
 
 	BoolVarDecls : BOOLEAN . IDENT BoolIDlist EOL 
 
-	IDENT	shift 39
+	IDENT	shift 40
 
 
 	.	error
@@ -271,9 +272,9 @@ state 22:
 	IntVarDecls : INTEGER IDENT . IntIDlist EOL 
 
 	EOL	reduce by rule 18
-	COMMA	shift 41
+	COMMA	shift 42
 
-	IntIDlist	goto 40
+	IntIDlist	goto 41
 
 	.	error
 
@@ -285,7 +286,7 @@ state 23:
 	LBRACE	reduce by rule 4
 	PROCEDURE	shift 12
 
-	ProcDecls	goto 42
+	ProcDecls	goto 43
 	ProcDef	goto 10
 
 	.	error
@@ -301,7 +302,7 @@ state 24:
 	BOOLEAN	reduce by rule 8
 	PROCEDURE	reduce by rule 8
 
-	Block	goto 43
+	Block	goto 44
 	VarDecls	goto 3
 	RatVarDecls	goto 2
 	DeclarationSeq	goto 1
@@ -313,7 +314,7 @@ state 25:
 
 	RatVarDecls : RATIONAL IDENT RatIDlist . EOL 
 
-	EOL	shift 44
+	EOL	shift 45
 
 
 	.	error
@@ -323,7 +324,7 @@ state 26:
 
 	RatIDlist : COMMA . IDENT RatIDlist 
 
-	IDENT	shift 45
+	IDENT	shift 46
 
 
 	.	error
@@ -334,13 +335,13 @@ state 27:
 	commandSeq : LBRACE command EOL . comSeqInBrace RBRACE 
 
 	LPAREN	shift 19
-	RBRACE	reduce by rule 48
+	RBRACE	reduce by rule 49
 	IDENT	shift 17
 	PRINT	shift 16
 	IF	shift 15
 
-	command	goto 47
-	comSeqInBrace	goto 46
+	command	goto 48
+	comSeqInBrace	goto 47
 
 	.	error
 
@@ -353,11 +354,11 @@ state 28:
 	boolExp : boolExp . EQ boolExp 
 	boolExp : boolExp . NEQ boolExp 
 
-	AND	shift 52
-	OR	shift 51
-	NEQ	shift 50
-	EQ	shift 49
-	THEN	shift 48
+	AND	shift 53
+	OR	shift 52
+	NEQ	shift 51
+	EQ	shift 50
+	THEN	shift 49
 
 
 	.	error
@@ -381,21 +382,21 @@ state 29:
 	boolExp : exp . GT exp 
 	boolExp : exp . GEQ exp 
 
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	LT	shift 58
-	LEQ	shift 57
-	GT	shift 56
-	GEQ	shift 55
-	NEQ	shift 54
-	EQ	shift 53
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	LT	shift 59
+	LEQ	shift 58
+	GT	shift 57
+	GEQ	shift 56
+	NEQ	shift 55
+	EQ	shift 54
 
 
 	.	error
@@ -405,7 +406,8 @@ state 30:
 
 	boolExp : NOT . boolExp 
 
-	LPAREN	shift 35
+	LPAREN	shift 36
+	IDENT	shift 35
 	FALSE	shift 34
 	TRUE	shift 33
 	NUMBA	shift 32
@@ -413,7 +415,7 @@ state 30:
 	NOT	shift 30
 
 	exp	goto 29
-	boolExp	goto 68
+	boolExp	goto 69
 
 	.	error
 
@@ -478,23 +480,7 @@ state 32:
 
 state 33:
 
-	boolExp : TRUE .  (reduce by rule 41)
-
-	RPAREN	reduce by rule 41
-	EOL	reduce by rule 41
-	AND	reduce by rule 41
-	OR	reduce by rule 41
-	NEQ	reduce by rule 41
-	EQ	reduce by rule 41
-	THEN	reduce by rule 41
-
-
-	.	error
-
-
-state 34:
-
-	boolExp : FALSE .  (reduce by rule 42)
+	boolExp : TRUE .  (reduce by rule 42)
 
 	RPAREN	reduce by rule 42
 	EOL	reduce by rule 42
@@ -508,103 +494,151 @@ state 34:
 	.	error
 
 
+state 34:
+
+	boolExp : FALSE .  (reduce by rule 43)
+
+	RPAREN	reduce by rule 43
+	EOL	reduce by rule 43
+	AND	reduce by rule 43
+	OR	reduce by rule 43
+	NEQ	reduce by rule 43
+	EQ	reduce by rule 43
+	THEN	reduce by rule 43
+
+
+	.	error
+
+
 state 35:
 
-	exp : LPAREN . exp RPAREN 
-	boolExp : LPAREN . boolExp RPAREN 
+	exp : IDENT .  (reduce by rule 31)
 
-	LPAREN	shift 35
-	FALSE	shift 34
-	TRUE	shift 33
-	NUMBA	shift 32
-	DECI	shift 31
-	NOT	shift 30
+	RPAREN	reduce by rule 31
+	DIV	reduce by rule 31
+	MUL	reduce by rule 31
+	ADD	reduce by rule 31
+	SUB	reduce by rule 31
+	MOD	reduce by rule 31
+	RATADD	reduce by rule 31
+	RATSUB	reduce by rule 31
+	RATMUL	reduce by rule 31
+	RATDIV	reduce by rule 31
+	EOL	reduce by rule 31
+	AND	reduce by rule 31
+	OR	reduce by rule 31
+	LT	reduce by rule 31
+	LEQ	reduce by rule 31
+	GT	reduce by rule 31
+	GEQ	reduce by rule 31
+	NEQ	reduce by rule 31
+	EQ	reduce by rule 31
+	THEN	reduce by rule 31
 
-	exp	goto 70
-	boolExp	goto 69
 
 	.	error
 
 
 state 36:
 
-	command : PRINT LPAREN . exp RPAREN 
-	command : PRINT LPAREN . boolExp RPAREN 
+	exp : LPAREN . exp RPAREN 
+	boolExp : LPAREN . boolExp RPAREN 
 
-	LPAREN	shift 35
+	LPAREN	shift 36
+	IDENT	shift 35
 	FALSE	shift 34
 	TRUE	shift 33
 	NUMBA	shift 32
 	DECI	shift 31
 	NOT	shift 30
 
-	exp	goto 72
-	boolExp	goto 71
+	exp	goto 71
+	boolExp	goto 70
 
 	.	error
 
 
 state 37:
 
-	command : IDENT ASSIGN . exp 
-	command : IDENT ASSIGN . boolExp 
+	command : PRINT LPAREN . exp RPAREN 
+	command : PRINT LPAREN . boolExp RPAREN 
 
-	LPAREN	shift 35
+	LPAREN	shift 36
+	IDENT	shift 35
 	FALSE	shift 34
 	TRUE	shift 33
 	NUMBA	shift 32
 	DECI	shift 31
 	NOT	shift 30
 
-	exp	goto 74
-	boolExp	goto 73
+	exp	goto 73
+	boolExp	goto 72
 
 	.	error
 
 
 state 38:
 
-	command : LPAREN command . RPAREN 
+	command : IDENT ASSIGN . exp 
+	command : IDENT ASSIGN . boolExp 
 
-	RPAREN	shift 75
+	LPAREN	shift 36
+	IDENT	shift 35
+	FALSE	shift 34
+	TRUE	shift 33
+	NUMBA	shift 32
+	DECI	shift 31
+	NOT	shift 30
 
+	exp	goto 75
+	boolExp	goto 74
 
 	.	error
 
 
 state 39:
 
-	BoolVarDecls : BOOLEAN IDENT . BoolIDlist EOL 
+	command : LPAREN command . RPAREN 
 
-	EOL	reduce by rule 14
-	COMMA	shift 77
+	RPAREN	shift 76
 
-	BoolIDlist	goto 76
 
 	.	error
 
 
 state 40:
 
-	IntVarDecls : INTEGER IDENT IntIDlist . EOL 
+	BoolVarDecls : BOOLEAN IDENT . BoolIDlist EOL 
 
-	EOL	shift 78
+	EOL	reduce by rule 14
+	COMMA	shift 78
 
+	BoolIDlist	goto 77
 
 	.	error
 
 
 state 41:
 
-	IntIDlist : COMMA . IDENT IntIDlist 
+	IntVarDecls : INTEGER IDENT IntIDlist . EOL 
 
-	IDENT	shift 79
+	EOL	shift 79
 
 
 	.	error
 
 
 state 42:
+
+	IntIDlist : COMMA . IDENT IntIDlist 
+
+	IDENT	shift 80
+
+
+	.	error
+
+
+state 43:
 
 	ProcDecls : ProcDef EOL ProcDecls .  (reduce by rule 3)
 
@@ -614,7 +648,7 @@ state 42:
 	.	error
 
 
-state 43:
+state 44:
 
 	ProcDef : PROCEDURE IDENT Block .  (reduce by rule 5)
 
@@ -624,7 +658,7 @@ state 43:
 	.	error
 
 
-state 44:
+state 45:
 
 	RatVarDecls : RATIONAL IDENT RatIDlist EOL .  (reduce by rule 7)
 
@@ -637,33 +671,23 @@ state 44:
 	.	error
 
 
-state 45:
+state 46:
 
 	RatIDlist : COMMA IDENT . RatIDlist 
 
 	EOL	reduce by rule 16
 	COMMA	shift 26
 
-	RatIDlist	goto 80
-
-	.	error
-
-
-state 46:
-
-	commandSeq : LBRACE command EOL comSeqInBrace . RBRACE 
-
-	RBRACE	shift 81
-
+	RatIDlist	goto 81
 
 	.	error
 
 
 state 47:
 
-	comSeqInBrace : command . EOL comSeqInBrace 
+	commandSeq : LBRACE command EOL comSeqInBrace . RBRACE 
 
-	EOL	shift 82
+	RBRACE	shift 82
 
 
 	.	error
@@ -671,37 +695,31 @@ state 47:
 
 state 48:
 
-	command : IF boolExp THEN . commandSeq ELSE commandSeq FI 
+	comSeqInBrace : command . EOL comSeqInBrace 
 
-	LBRACE	shift 7
+	EOL	shift 83
 
-	commandSeq	goto 83
 
 	.	error
 
 
 state 49:
 
-	boolExp : boolExp EQ . boolExp 
+	command : IF boolExp THEN . commandSeq ELSE commandSeq FI 
 
-	LPAREN	shift 35
-	FALSE	shift 34
-	TRUE	shift 33
-	NUMBA	shift 32
-	DECI	shift 31
-	NOT	shift 30
+	LBRACE	shift 7
 
-	exp	goto 29
-	boolExp	goto 84
+	commandSeq	goto 84
 
 	.	error
 
 
 state 50:
 
-	boolExp : boolExp NEQ . boolExp 
+	boolExp : boolExp EQ . boolExp 
 
-	LPAREN	shift 35
+	LPAREN	shift 36
+	IDENT	shift 35
 	FALSE	shift 34
 	TRUE	shift 33
 	NUMBA	shift 32
@@ -716,9 +734,10 @@ state 50:
 
 state 51:
 
-	boolExp : boolExp OR . boolExp 
+	boolExp : boolExp NEQ . boolExp 
 
-	LPAREN	shift 35
+	LPAREN	shift 36
+	IDENT	shift 35
 	FALSE	shift 34
 	TRUE	shift 33
 	NUMBA	shift 32
@@ -733,9 +752,10 @@ state 51:
 
 state 52:
 
-	boolExp : boolExp AND . boolExp 
+	boolExp : boolExp OR . boolExp 
 
-	LPAREN	shift 35
+	LPAREN	shift 36
+	IDENT	shift 35
 	FALSE	shift 34
 	TRUE	shift 33
 	NUMBA	shift 32
@@ -750,35 +770,42 @@ state 52:
 
 state 53:
 
-	boolExp : exp EQ . exp 
+	boolExp : boolExp AND . boolExp 
 
-	LPAREN	shift 89
+	LPAREN	shift 36
+	IDENT	shift 35
+	FALSE	shift 34
+	TRUE	shift 33
 	NUMBA	shift 32
 	DECI	shift 31
+	NOT	shift 30
 
-	exp	goto 88
+	exp	goto 29
+	boolExp	goto 88
 
 	.	error
 
 
 state 54:
 
-	boolExp : exp NEQ . exp 
+	boolExp : exp EQ . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
-	exp	goto 90
+	exp	goto 89
 
 	.	error
 
 
 state 55:
 
-	boolExp : exp GEQ . exp 
+	boolExp : exp NEQ . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -789,9 +816,10 @@ state 55:
 
 state 56:
 
-	boolExp : exp GT . exp 
+	boolExp : exp GEQ . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -802,9 +830,10 @@ state 56:
 
 state 57:
 
-	boolExp : exp LEQ . exp 
+	boolExp : exp GT . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -815,9 +844,10 @@ state 57:
 
 state 58:
 
-	boolExp : exp LT . exp 
+	boolExp : exp LEQ . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -828,9 +858,10 @@ state 58:
 
 state 59:
 
-	exp : exp RATDIV . exp 
+	boolExp : exp LT . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -841,9 +872,10 @@ state 59:
 
 state 60:
 
-	exp : exp RATMUL . exp 
+	exp : exp RATDIV . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -854,9 +886,10 @@ state 60:
 
 state 61:
 
-	exp : exp RATSUB . exp 
+	exp : exp RATMUL . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -867,9 +900,10 @@ state 61:
 
 state 62:
 
-	exp : exp RATADD . exp 
+	exp : exp RATSUB . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -880,9 +914,10 @@ state 62:
 
 state 63:
 
-	exp : exp MOD . exp 
+	exp : exp RATADD . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -893,9 +928,10 @@ state 63:
 
 state 64:
 
-	exp : exp SUB . exp 
+	exp : exp MOD . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -906,9 +942,10 @@ state 64:
 
 state 65:
 
-	exp : exp ADD . exp 
+	exp : exp SUB . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -919,9 +956,10 @@ state 65:
 
 state 66:
 
-	exp : exp MUL . exp 
+	exp : exp ADD . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -932,9 +970,10 @@ state 66:
 
 state 67:
 
-	exp : exp DIV . exp 
+	exp : exp MUL . exp 
 
-	LPAREN	shift 89
+	LPAREN	shift 90
+	IDENT	shift 35
 	NUMBA	shift 32
 	DECI	shift 31
 
@@ -945,20 +984,14 @@ state 67:
 
 state 68:
 
-	boolExp : boolExp . AND boolExp 
-	boolExp : boolExp . OR boolExp 
-	boolExp : NOT boolExp .  (reduce by rule 33)
-	boolExp : boolExp . EQ boolExp 
-	boolExp : boolExp . NEQ boolExp 
+	exp : exp DIV . exp 
 
-	RPAREN	reduce by rule 33
-	EOL	reduce by rule 33
-	AND	shift 52
-	OR	shift 51
-	NEQ	reduce by rule 33
-	EQ	reduce by rule 33
-	THEN	reduce by rule 33
+	LPAREN	shift 90
+	IDENT	shift 35
+	NUMBA	shift 32
+	DECI	shift 31
 
+	exp	goto 104
 
 	.	error
 
@@ -967,21 +1000,41 @@ state 69:
 
 	boolExp : boolExp . AND boolExp 
 	boolExp : boolExp . OR boolExp 
-	boolExp : LPAREN boolExp . RPAREN 
+	boolExp : NOT boolExp .  (reduce by rule 34)
 	boolExp : boolExp . EQ boolExp 
 	boolExp : boolExp . NEQ boolExp 
 
-	RPAREN	shift 104
-	AND	shift 52
-	OR	shift 51
-	NEQ	shift 50
-	EQ	shift 49
+	RPAREN	reduce by rule 34
+	EOL	reduce by rule 34
+	AND	shift 53
+	OR	shift 52
+	NEQ	reduce by rule 34
+	EQ	reduce by rule 34
+	THEN	reduce by rule 34
 
 
 	.	error
 
 
 state 70:
+
+	boolExp : boolExp . AND boolExp 
+	boolExp : boolExp . OR boolExp 
+	boolExp : LPAREN boolExp . RPAREN 
+	boolExp : boolExp . EQ boolExp 
+	boolExp : boolExp . NEQ boolExp 
+
+	RPAREN	shift 105
+	AND	shift 53
+	OR	shift 52
+	NEQ	shift 51
+	EQ	shift 50
+
+
+	.	error
+
+
+state 71:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1000,28 +1053,28 @@ state 70:
 	boolExp : exp . GT exp 
 	boolExp : exp . GEQ exp 
 
-	RPAREN	shift 105
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	LT	shift 58
-	LEQ	shift 57
-	GT	shift 56
-	GEQ	shift 55
-	NEQ	shift 54
-	EQ	shift 53
+	RPAREN	shift 106
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	LT	shift 59
+	LEQ	shift 58
+	GT	shift 57
+	GEQ	shift 56
+	NEQ	shift 55
+	EQ	shift 54
 
 
 	.	error
 
 
-state 71:
+state 72:
 
 	command : PRINT LPAREN boolExp . RPAREN 
 	boolExp : boolExp . AND boolExp 
@@ -1029,17 +1082,17 @@ state 71:
 	boolExp : boolExp . EQ boolExp 
 	boolExp : boolExp . NEQ boolExp 
 
-	RPAREN	shift 106
-	AND	shift 52
-	OR	shift 51
-	NEQ	shift 50
-	EQ	shift 49
+	RPAREN	shift 107
+	AND	shift 53
+	OR	shift 52
+	NEQ	shift 51
+	EQ	shift 50
 
 
 	.	error
 
 
-state 72:
+state 73:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1058,47 +1111,47 @@ state 72:
 	boolExp : exp . GT exp 
 	boolExp : exp . GEQ exp 
 
-	RPAREN	shift 107
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	LT	shift 58
-	LEQ	shift 57
-	GT	shift 56
-	GEQ	shift 55
-	NEQ	shift 54
-	EQ	shift 53
-
-
-	.	error
-
-
-state 73:
-
-	command : IDENT ASSIGN boolExp .  (reduce by rule 54)
-	boolExp : boolExp . AND boolExp 
-	boolExp : boolExp . OR boolExp 
-	boolExp : boolExp . EQ boolExp 
-	boolExp : boolExp . NEQ boolExp 
-
-	RPAREN	reduce by rule 54
-	EOL	reduce by rule 54
-	AND	shift 52
-	OR	shift 51
-	NEQ	shift 50
-	EQ	shift 49
+	RPAREN	shift 108
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	LT	shift 59
+	LEQ	shift 58
+	GT	shift 57
+	GEQ	shift 56
+	NEQ	shift 55
+	EQ	shift 54
 
 
 	.	error
 
 
 state 74:
+
+	command : IDENT ASSIGN boolExp .  (reduce by rule 55)
+	boolExp : boolExp . AND boolExp 
+	boolExp : boolExp . OR boolExp 
+	boolExp : boolExp . EQ boolExp 
+	boolExp : boolExp . NEQ boolExp 
+
+	RPAREN	reduce by rule 55
+	EOL	reduce by rule 55
+	AND	shift 53
+	OR	shift 52
+	NEQ	shift 51
+	EQ	shift 50
+
+
+	.	error
+
+
+state 75:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1109,7 +1162,7 @@ state 74:
 	exp : exp . DIV exp 
 	exp : exp . RATDIV exp 
 	exp : exp . MOD exp 
-	command : IDENT ASSIGN exp .  (reduce by rule 53)
+	command : IDENT ASSIGN exp .  (reduce by rule 54)
 	boolExp : exp . EQ exp 
 	boolExp : exp . NEQ exp 
 	boolExp : exp . LT exp 
@@ -1117,34 +1170,23 @@ state 74:
 	boolExp : exp . GT exp 
 	boolExp : exp . GEQ exp 
 
-	RPAREN	reduce by rule 53
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	EOL	reduce by rule 53
-	LT	shift 58
-	LEQ	shift 57
-	GT	shift 56
-	GEQ	shift 55
-	NEQ	shift 54
-	EQ	shift 53
-
-
-	.	error
-
-
-state 75:
-
-	command : LPAREN command RPAREN .  (reduce by rule 52)
-
-	RPAREN	reduce by rule 52
-	EOL	reduce by rule 52
+	RPAREN	reduce by rule 54
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	EOL	reduce by rule 54
+	LT	shift 59
+	LEQ	shift 58
+	GT	shift 57
+	GEQ	shift 56
+	NEQ	shift 55
+	EQ	shift 54
 
 
 	.	error
@@ -1152,9 +1194,10 @@ state 75:
 
 state 76:
 
-	BoolVarDecls : BOOLEAN IDENT BoolIDlist . EOL 
+	command : LPAREN command RPAREN .  (reduce by rule 53)
 
-	EOL	shift 108
+	RPAREN	reduce by rule 53
+	EOL	reduce by rule 53
 
 
 	.	error
@@ -1162,15 +1205,25 @@ state 76:
 
 state 77:
 
-	BoolIDlist : COMMA . IDENT BoolIDlist 
+	BoolVarDecls : BOOLEAN IDENT BoolIDlist . EOL 
 
-	IDENT	shift 109
+	EOL	shift 109
 
 
 	.	error
 
 
 state 78:
+
+	BoolIDlist : COMMA . IDENT BoolIDlist 
+
+	IDENT	shift 110
+
+
+	.	error
+
+
+state 79:
 
 	IntVarDecls : INTEGER IDENT IntIDlist EOL .  (reduce by rule 9)
 
@@ -1182,19 +1235,19 @@ state 78:
 	.	error
 
 
-state 79:
+state 80:
 
 	IntIDlist : COMMA IDENT . IntIDlist 
 
 	EOL	reduce by rule 18
-	COMMA	shift 41
+	COMMA	shift 42
 
-	IntIDlist	goto 110
+	IntIDlist	goto 111
 
 	.	error
 
 
-state 80:
+state 81:
 
 	RatIDlist : COMMA IDENT RatIDlist .  (reduce by rule 15)
 
@@ -1204,59 +1257,40 @@ state 80:
 	.	error
 
 
-state 81:
-
-	commandSeq : LBRACE command EOL comSeqInBrace RBRACE .  (reduce by rule 45)
-
-	EOL	reduce by rule 45
-	EOF	reduce by rule 45
-	ELSE	reduce by rule 45
-	FI	reduce by rule 45
-
-
-	.	error
-
-
 state 82:
 
-	comSeqInBrace : command EOL . comSeqInBrace 
+	commandSeq : LBRACE command EOL comSeqInBrace RBRACE .  (reduce by rule 46)
 
-	LPAREN	shift 19
-	RBRACE	reduce by rule 48
-	IDENT	shift 17
-	PRINT	shift 16
-	IF	shift 15
+	EOL	reduce by rule 46
+	EOF	reduce by rule 46
+	ELSE	reduce by rule 46
+	FI	reduce by rule 46
 
-	command	goto 47
-	comSeqInBrace	goto 111
 
 	.	error
 
 
 state 83:
 
-	command : IF boolExp THEN commandSeq . ELSE commandSeq FI 
+	comSeqInBrace : command EOL . comSeqInBrace 
 
-	ELSE	shift 112
+	LPAREN	shift 19
+	RBRACE	reduce by rule 49
+	IDENT	shift 17
+	PRINT	shift 16
+	IF	shift 15
 
+	command	goto 48
+	comSeqInBrace	goto 112
 
 	.	error
 
 
 state 84:
 
-	boolExp : boolExp . AND boolExp 
-	boolExp : boolExp . OR boolExp 
-	boolExp : boolExp . EQ boolExp 
-	boolExp : boolExp EQ boolExp .  (reduce by rule 43)
-	boolExp : boolExp . NEQ boolExp 
+	command : IF boolExp THEN commandSeq . ELSE commandSeq FI 
 
-	RPAREN	reduce by rule 43
-	EOL	reduce by rule 43
-	AND	shift 52
-	OR	shift 51
-	NEQ	shift 50
-	THEN	reduce by rule 43
+	ELSE	shift 113
 
 
 	.	error
@@ -1267,14 +1301,14 @@ state 85:
 	boolExp : boolExp . AND boolExp 
 	boolExp : boolExp . OR boolExp 
 	boolExp : boolExp . EQ boolExp 
+	boolExp : boolExp EQ boolExp .  (reduce by rule 44)
 	boolExp : boolExp . NEQ boolExp 
-	boolExp : boolExp NEQ boolExp .  (reduce by rule 44)
 
 	RPAREN	reduce by rule 44
 	EOL	reduce by rule 44
-	AND	shift 52
-	OR	shift 51
-	EQ	reduce by rule 44
+	AND	shift 53
+	OR	shift 52
+	NEQ	shift 51
 	THEN	reduce by rule 44
 
 
@@ -1285,13 +1319,52 @@ state 86:
 
 	boolExp : boolExp . AND boolExp 
 	boolExp : boolExp . OR boolExp 
-	boolExp : boolExp OR boolExp .  (reduce by rule 32)
+	boolExp : boolExp . EQ boolExp 
+	boolExp : boolExp . NEQ boolExp 
+	boolExp : boolExp NEQ boolExp .  (reduce by rule 45)
+
+	RPAREN	reduce by rule 45
+	EOL	reduce by rule 45
+	AND	shift 53
+	OR	shift 52
+	EQ	reduce by rule 45
+	THEN	reduce by rule 45
+
+
+	.	error
+
+
+state 87:
+
+	boolExp : boolExp . AND boolExp 
+	boolExp : boolExp . OR boolExp 
+	boolExp : boolExp OR boolExp .  (reduce by rule 33)
+	boolExp : boolExp . EQ boolExp 
+	boolExp : boolExp . NEQ boolExp 
+
+	RPAREN	reduce by rule 33
+	EOL	reduce by rule 33
+	AND	shift 53
+	OR	reduce by rule 33
+	NEQ	reduce by rule 33
+	EQ	reduce by rule 33
+	THEN	reduce by rule 33
+
+
+	.	error
+
+
+state 88:
+
+	boolExp : boolExp . AND boolExp 
+	boolExp : boolExp AND boolExp .  (reduce by rule 32)
+	boolExp : boolExp . OR boolExp 
 	boolExp : boolExp . EQ boolExp 
 	boolExp : boolExp . NEQ boolExp 
 
 	RPAREN	reduce by rule 32
 	EOL	reduce by rule 32
-	AND	shift 52
+	AND	reduce by rule 32
 	OR	reduce by rule 32
 	NEQ	reduce by rule 32
 	EQ	reduce by rule 32
@@ -1301,75 +1374,8 @@ state 86:
 	.	error
 
 
-state 87:
-
-	boolExp : boolExp . AND boolExp 
-	boolExp : boolExp AND boolExp .  (reduce by rule 31)
-	boolExp : boolExp . OR boolExp 
-	boolExp : boolExp . EQ boolExp 
-	boolExp : boolExp . NEQ boolExp 
-
-	RPAREN	reduce by rule 31
-	EOL	reduce by rule 31
-	AND	reduce by rule 31
-	OR	reduce by rule 31
-	NEQ	reduce by rule 31
-	EQ	reduce by rule 31
-	THEN	reduce by rule 31
-
-
-	.	error
-
-
-state 88:
-
-	exp : exp . ADD exp 
-	exp : exp . RATADD exp 
-	exp : exp . SUB exp 
-	exp : exp . RATSUB exp 
-	exp : exp . MUL exp 
-	exp : exp . RATMUL exp 
-	exp : exp . DIV exp 
-	exp : exp . RATDIV exp 
-	exp : exp . MOD exp 
-	boolExp : exp EQ exp .  (reduce by rule 34)
-
-	RPAREN	reduce by rule 34
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	EOL	reduce by rule 34
-	AND	reduce by rule 34
-	OR	reduce by rule 34
-	NEQ	reduce by rule 34
-	EQ	reduce by rule 34
-	THEN	reduce by rule 34
-
-
-	.	error
-
-
 state 89:
 
-	exp : LPAREN . exp RPAREN 
-
-	LPAREN	shift 89
-	NUMBA	shift 32
-	DECI	shift 31
-
-	exp	goto 113
-
-	.	error
-
-
-state 90:
-
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
 	exp : exp . SUB exp 
@@ -1379,18 +1385,18 @@ state 90:
 	exp : exp . DIV exp 
 	exp : exp . RATDIV exp 
 	exp : exp . MOD exp 
-	boolExp : exp NEQ exp .  (reduce by rule 35)
+	boolExp : exp EQ exp .  (reduce by rule 35)
 
 	RPAREN	reduce by rule 35
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
 	EOL	reduce by rule 35
 	AND	reduce by rule 35
 	OR	reduce by rule 35
@@ -1398,6 +1404,20 @@ state 90:
 	EQ	reduce by rule 35
 	THEN	reduce by rule 35
 
+
+	.	error
+
+
+state 90:
+
+	exp : LPAREN . exp RPAREN 
+
+	LPAREN	shift 90
+	IDENT	shift 35
+	NUMBA	shift 32
+	DECI	shift 31
+
+	exp	goto 114
 
 	.	error
 
@@ -1413,24 +1433,24 @@ state 91:
 	exp : exp . DIV exp 
 	exp : exp . RATDIV exp 
 	exp : exp . MOD exp 
-	boolExp : exp GEQ exp .  (reduce by rule 39)
+	boolExp : exp NEQ exp .  (reduce by rule 36)
 
-	RPAREN	reduce by rule 39
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	EOL	reduce by rule 39
-	AND	reduce by rule 39
-	OR	reduce by rule 39
-	NEQ	reduce by rule 39
-	EQ	reduce by rule 39
-	THEN	reduce by rule 39
+	RPAREN	reduce by rule 36
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	EOL	reduce by rule 36
+	AND	reduce by rule 36
+	OR	reduce by rule 36
+	NEQ	reduce by rule 36
+	EQ	reduce by rule 36
+	THEN	reduce by rule 36
 
 
 	.	error
@@ -1447,24 +1467,24 @@ state 92:
 	exp : exp . DIV exp 
 	exp : exp . RATDIV exp 
 	exp : exp . MOD exp 
-	boolExp : exp GT exp .  (reduce by rule 38)
+	boolExp : exp GEQ exp .  (reduce by rule 40)
 
-	RPAREN	reduce by rule 38
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	EOL	reduce by rule 38
-	AND	reduce by rule 38
-	OR	reduce by rule 38
-	NEQ	reduce by rule 38
-	EQ	reduce by rule 38
-	THEN	reduce by rule 38
+	RPAREN	reduce by rule 40
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	EOL	reduce by rule 40
+	AND	reduce by rule 40
+	OR	reduce by rule 40
+	NEQ	reduce by rule 40
+	EQ	reduce by rule 40
+	THEN	reduce by rule 40
 
 
 	.	error
@@ -1481,24 +1501,24 @@ state 93:
 	exp : exp . DIV exp 
 	exp : exp . RATDIV exp 
 	exp : exp . MOD exp 
-	boolExp : exp LEQ exp .  (reduce by rule 37)
+	boolExp : exp GT exp .  (reduce by rule 39)
 
-	RPAREN	reduce by rule 37
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	EOL	reduce by rule 37
-	AND	reduce by rule 37
-	OR	reduce by rule 37
-	NEQ	reduce by rule 37
-	EQ	reduce by rule 37
-	THEN	reduce by rule 37
+	RPAREN	reduce by rule 39
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	EOL	reduce by rule 39
+	AND	reduce by rule 39
+	OR	reduce by rule 39
+	NEQ	reduce by rule 39
+	EQ	reduce by rule 39
+	THEN	reduce by rule 39
 
 
 	.	error
@@ -1515,30 +1535,64 @@ state 94:
 	exp : exp . DIV exp 
 	exp : exp . RATDIV exp 
 	exp : exp . MOD exp 
-	boolExp : exp LT exp .  (reduce by rule 36)
+	boolExp : exp LEQ exp .  (reduce by rule 38)
 
-	RPAREN	reduce by rule 36
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
-	EOL	reduce by rule 36
-	AND	reduce by rule 36
-	OR	reduce by rule 36
-	NEQ	reduce by rule 36
-	EQ	reduce by rule 36
-	THEN	reduce by rule 36
+	RPAREN	reduce by rule 38
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	EOL	reduce by rule 38
+	AND	reduce by rule 38
+	OR	reduce by rule 38
+	NEQ	reduce by rule 38
+	EQ	reduce by rule 38
+	THEN	reduce by rule 38
 
 
 	.	error
 
 
 state 95:
+
+	exp : exp . ADD exp 
+	exp : exp . RATADD exp 
+	exp : exp . SUB exp 
+	exp : exp . RATSUB exp 
+	exp : exp . MUL exp 
+	exp : exp . RATMUL exp 
+	exp : exp . DIV exp 
+	exp : exp . RATDIV exp 
+	exp : exp . MOD exp 
+	boolExp : exp LT exp .  (reduce by rule 37)
+
+	RPAREN	reduce by rule 37
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
+	EOL	reduce by rule 37
+	AND	reduce by rule 37
+	OR	reduce by rule 37
+	NEQ	reduce by rule 37
+	EQ	reduce by rule 37
+	THEN	reduce by rule 37
+
+
+	.	error
+
+
+state 96:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1576,7 +1630,7 @@ state 95:
 	.	error
 
 
-state 96:
+state 97:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1614,7 +1668,7 @@ state 96:
 	.	error
 
 
-state 97:
+state 98:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1628,15 +1682,15 @@ state 97:
 	exp : exp . MOD exp 
 
 	RPAREN	reduce by rule 22
-	DIV	shift 67
-	MUL	shift 66
+	DIV	shift 68
+	MUL	shift 67
 	ADD	reduce by rule 22
 	SUB	reduce by rule 22
-	MOD	shift 63
+	MOD	shift 64
 	RATADD	reduce by rule 22
 	RATSUB	reduce by rule 22
-	RATMUL	shift 60
-	RATDIV	shift 59
+	RATMUL	shift 61
+	RATDIV	shift 60
 	EOL	reduce by rule 22
 	AND	reduce by rule 22
 	OR	reduce by rule 22
@@ -1652,7 +1706,7 @@ state 97:
 	.	error
 
 
-state 98:
+state 99:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1666,15 +1720,15 @@ state 98:
 	exp : exp . MOD exp 
 
 	RPAREN	reduce by rule 20
-	DIV	shift 67
-	MUL	shift 66
+	DIV	shift 68
+	MUL	shift 67
 	ADD	reduce by rule 20
 	SUB	reduce by rule 20
-	MOD	shift 63
+	MOD	shift 64
 	RATADD	reduce by rule 20
 	RATSUB	reduce by rule 20
-	RATMUL	shift 60
-	RATDIV	shift 59
+	RATMUL	shift 61
+	RATDIV	shift 60
 	EOL	reduce by rule 20
 	AND	reduce by rule 20
 	OR	reduce by rule 20
@@ -1690,7 +1744,7 @@ state 98:
 	.	error
 
 
-state 99:
+state 100:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1728,7 +1782,7 @@ state 99:
 	.	error
 
 
-state 100:
+state 101:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1742,15 +1796,15 @@ state 100:
 	exp : exp . MOD exp 
 
 	RPAREN	reduce by rule 21
-	DIV	shift 67
-	MUL	shift 66
+	DIV	shift 68
+	MUL	shift 67
 	ADD	reduce by rule 21
 	SUB	reduce by rule 21
-	MOD	shift 63
+	MOD	shift 64
 	RATADD	reduce by rule 21
 	RATSUB	reduce by rule 21
-	RATMUL	shift 60
-	RATDIV	shift 59
+	RATMUL	shift 61
+	RATDIV	shift 60
 	EOL	reduce by rule 21
 	AND	reduce by rule 21
 	OR	reduce by rule 21
@@ -1766,7 +1820,7 @@ state 100:
 	.	error
 
 
-state 101:
+state 102:
 
 	exp : exp . ADD exp 
 	exp : exp ADD exp .  (reduce by rule 19)
@@ -1780,15 +1834,15 @@ state 101:
 	exp : exp . MOD exp 
 
 	RPAREN	reduce by rule 19
-	DIV	shift 67
-	MUL	shift 66
+	DIV	shift 68
+	MUL	shift 67
 	ADD	reduce by rule 19
 	SUB	reduce by rule 19
-	MOD	shift 63
+	MOD	shift 64
 	RATADD	reduce by rule 19
 	RATSUB	reduce by rule 19
-	RATMUL	shift 60
-	RATDIV	shift 59
+	RATMUL	shift 61
+	RATDIV	shift 60
 	EOL	reduce by rule 19
 	AND	reduce by rule 19
 	OR	reduce by rule 19
@@ -1804,7 +1858,7 @@ state 101:
 	.	error
 
 
-state 102:
+state 103:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1842,7 +1896,7 @@ state 102:
 	.	error
 
 
-state 103:
+state 104:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -1880,23 +1934,23 @@ state 103:
 	.	error
 
 
-state 104:
+state 105:
 
-	boolExp : LPAREN boolExp RPAREN .  (reduce by rule 40)
+	boolExp : LPAREN boolExp RPAREN .  (reduce by rule 41)
 
-	RPAREN	reduce by rule 40
-	EOL	reduce by rule 40
-	AND	reduce by rule 40
-	OR	reduce by rule 40
-	NEQ	reduce by rule 40
-	EQ	reduce by rule 40
-	THEN	reduce by rule 40
+	RPAREN	reduce by rule 41
+	EOL	reduce by rule 41
+	AND	reduce by rule 41
+	OR	reduce by rule 41
+	NEQ	reduce by rule 41
+	EQ	reduce by rule 41
+	THEN	reduce by rule 41
 
 
 	.	error
 
 
-state 105:
+state 106:
 
 	exp : LPAREN exp RPAREN .  (reduce by rule 30)
 
@@ -1925,9 +1979,20 @@ state 105:
 	.	error
 
 
-state 106:
+state 107:
 
-	command : PRINT LPAREN boolExp RPAREN .  (reduce by rule 51)
+	command : PRINT LPAREN boolExp RPAREN .  (reduce by rule 52)
+
+	RPAREN	reduce by rule 52
+	EOL	reduce by rule 52
+
+
+	.	error
+
+
+state 108:
+
+	command : PRINT LPAREN exp RPAREN .  (reduce by rule 51)
 
 	RPAREN	reduce by rule 51
 	EOL	reduce by rule 51
@@ -1936,18 +2001,7 @@ state 106:
 	.	error
 
 
-state 107:
-
-	command : PRINT LPAREN exp RPAREN .  (reduce by rule 50)
-
-	RPAREN	reduce by rule 50
-	EOL	reduce by rule 50
-
-
-	.	error
-
-
-state 108:
+state 109:
 
 	BoolVarDecls : BOOLEAN IDENT BoolIDlist EOL .  (reduce by rule 11)
 
@@ -1958,19 +2012,19 @@ state 108:
 	.	error
 
 
-state 109:
+state 110:
 
 	BoolIDlist : COMMA IDENT . BoolIDlist 
 
 	EOL	reduce by rule 14
-	COMMA	shift 77
+	COMMA	shift 78
 
-	BoolIDlist	goto 114
+	BoolIDlist	goto 115
 
 	.	error
 
 
-state 110:
+state 111:
 
 	IntIDlist : COMMA IDENT IntIDlist .  (reduce by rule 17)
 
@@ -1980,28 +2034,28 @@ state 110:
 	.	error
 
 
-state 111:
-
-	comSeqInBrace : command EOL comSeqInBrace .  (reduce by rule 47)
-
-	RBRACE	reduce by rule 47
-
-
-	.	error
-
-
 state 112:
 
-	command : IF boolExp THEN commandSeq ELSE . commandSeq FI 
+	comSeqInBrace : command EOL comSeqInBrace .  (reduce by rule 48)
 
-	LBRACE	shift 7
+	RBRACE	reduce by rule 48
 
-	commandSeq	goto 115
 
 	.	error
 
 
 state 113:
+
+	command : IF boolExp THEN commandSeq ELSE . commandSeq FI 
+
+	LBRACE	shift 7
+
+	commandSeq	goto 116
+
+	.	error
+
+
+state 114:
 
 	exp : exp . ADD exp 
 	exp : exp . RATADD exp 
@@ -2014,22 +2068,22 @@ state 113:
 	exp : exp . MOD exp 
 	exp : LPAREN exp . RPAREN 
 
-	RPAREN	shift 105
-	DIV	shift 67
-	MUL	shift 66
-	ADD	shift 65
-	SUB	shift 64
-	MOD	shift 63
-	RATADD	shift 62
-	RATSUB	shift 61
-	RATMUL	shift 60
-	RATDIV	shift 59
+	RPAREN	shift 106
+	DIV	shift 68
+	MUL	shift 67
+	ADD	shift 66
+	SUB	shift 65
+	MOD	shift 64
+	RATADD	shift 63
+	RATSUB	shift 62
+	RATMUL	shift 61
+	RATDIV	shift 60
 
 
 	.	error
 
 
-state 114:
+state 115:
 
 	BoolIDlist : COMMA IDENT BoolIDlist .  (reduce by rule 13)
 
@@ -2039,28 +2093,28 @@ state 114:
 	.	error
 
 
-state 115:
+state 116:
 
 	command : IF boolExp THEN commandSeq ELSE commandSeq . FI 
 
-	FI	shift 116
-
-
-	.	error
-
-
-state 116:
-
-	command : IF boolExp THEN commandSeq ELSE commandSeq FI .  (reduce by rule 49)
-
-	RPAREN	reduce by rule 49
-	EOL	reduce by rule 49
+	FI	shift 117
 
 
 	.	error
 
 
 state 117:
+
+	command : IF boolExp THEN commandSeq ELSE commandSeq FI .  (reduce by rule 50)
+
+	RPAREN	reduce by rule 50
+	EOL	reduce by rule 50
+
+
+	.	error
+
+
+state 118:
 
 
 	EOL	accept
@@ -2069,5 +2123,5 @@ state 117:
 
 	.	error
 
-588 of 819 action table entries left after compaction
+610 of 865 action table entries left after compaction
 64 goto table entries

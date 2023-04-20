@@ -54,7 +54,7 @@ fun printScopeNumbers(block(decSeq(_,a),b,c,d)) =
 
 %%
     (*Program: commandSeq (runCMDSeq(commandSeq))*)
-Program : Block (assignBlockScopes(Block, [])  ;printScopeNumbers(Block); scopeNumber := ~1)
+Program : Block (assignBlockScopes(Block, [])  ; scopeNumber := ~1; runBlock(Block))
 
 Block : DeclarationSeq commandSeq (scopeNumber := !scopeNumber + 1; block(DeclarationSeq, commandSeq, !scopeNumber, ref []))
      
@@ -93,6 +93,7 @@ exp : exp ADD exp (int(add(exp1, exp2)))
     | NUMBA (intType(BigInt.getBigInt(NUMBA)))
     | DECI (ratType(Rational.fromDecimal(DECI)))
     | LPAREN exp RPAREN (exp)
+    | IDENT (var(IDENT))
     
 
 boolExp: boolExp AND boolExp (andOp(boolExp1, boolExp2))

@@ -1,15 +1,10 @@
-procedure f
-procedure b
+rational a,b,c;
+integer a;
 {
-    (* hello world, this is a commetn*)
-};
-{
-
-};
-procedure c
-{
-
-};
-{
-    
+    c := 314.313(012);
+    b := 4143.12;
+    a := 3;
+    print(c);
+    print(b);
+    print(a);
 }

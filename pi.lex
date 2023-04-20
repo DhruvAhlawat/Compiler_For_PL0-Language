@@ -63,6 +63,10 @@ spaces = [\ \t];
 "<" => (T.LT(!lin,!col));
 "<>" => (T.NEQ(!lin,!col));
 
+"while" => (T.WHILE(!lin,!col));
+"do" => (T.DO(!lin,!col));
+"od" => (T.OD(!lin,!col));
+"read" => (T.READ(!lin,!col));
 "if" => (T.IF(!lin,!col));
 "fi" => (T.FI(!lin,!col));
 "then" => (T.THEN(!lin,!col));

@@ -2,6 +2,10 @@ signature Pi_TOKENS =
 sig
 type ('a,'b) token
 type svalue
+val OD:  'a * 'a -> (svalue,'a) token
+val DO:  'a * 'a -> (svalue,'a) token
+val WHILE:  'a * 'a -> (svalue,'a) token
+val CALL:  'a * 'a -> (svalue,'a) token
 val ASSIGN:  'a * 'a -> (svalue,'a) token
 val PROCEDURE:  'a * 'a -> (svalue,'a) token
 val COMMA:  'a * 'a -> (svalue,'a) token

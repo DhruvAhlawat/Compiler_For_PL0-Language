@@ -17,7 +17,8 @@ struct
         | gt of EXP * EXP | leq of EXP * EXP | geq of EXP * EXP | beq of BOOLEXP * BOOLEXP | bneq of BOOLEXP * BOOLEXP;
 
     datatype COMMANDSEQ = empty | cons of COMMAND * COMMANDSEQ
-    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ | PrintBool of BOOLEXP | AssignCMD of string * EXP | AssignBoolCMD  of string * BOOLEXP
+    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ | PrintBool of BOOLEXP 
+    | AssignCMD of string * EXP | AssignBoolCMD  of string * BOOLEXP | WhileCMD of BOOLEXP * COMMANDSEQ | CallCMD of string 
 
     (* type PROCDEF = string*COMMANDSEQ *)
 
@@ -115,18 +116,18 @@ struct
 
 
     fun declareVariables(L, scopeNumber) =
-    let
-        fun helper([]) = ()
-        |   helper(rational(a) :: h) = (declareVar(a, ratType(Rational.fromDecimal("0.0(0)")), scopeNumber); helper(h))
-        |   helper(integer(a) :: h) = (declareVar(a, intType(BigInt.getBigInt("0")), scopeNumber); helper(h))
-        |   helper(boolean(a) :: h) = (declareVar(a, boolType(false), scopeNumber); helper(h))
-    in
-        helper(L)
-    end;
-    
+        let
+            fun helper([]) = ()
+            |   helper(rational(a) :: h) = (declareVar(a, ratType(Rational.fromDecimal("0.0(0)")), scopeNumber); helper(h))
+            |   helper(integer(a) :: h) = (declareVar(a, intType(BigInt.getBigInt("0")), scopeNumber); helper(h))
+            |   helper(boolean(a) :: h) = (declareVar(a, boolType(false), scopeNumber); helper(h))
+        in
+            helper(L)
+        end;
+        
     fun declareProcedures(emptyDec, scopeNumber) = () (*do nothing incase no procedures declared*)
-    |   declareProcedures(procDecls(procDef(f,b),h), scopeNumber) = 
-        (declareProc(f, procDef(f,b), scopeNumber); declareProcedures(h, scopeNumber)) 
+        |   declareProcedures(procDecls(procDef(f,b),h), scopeNumber) = 
+            (declareProc(f, procDef(f,b), scopeNumber); declareProcedures(h, scopeNumber)) 
 (*end of symbolTable Stuff*)
 
 
@@ -229,6 +230,7 @@ struct
         |   runCMD(PrintBool(a), scopes) = (print(Bool.toString(evalBool(a,scopes))); print("\n"))
         |   runCMD(ConditionalCMD(a,b,c), scopes) = if (evalBool(a, scopes)) then runCMDSeq(b, scopes) else runCMDSeq(c, scopes)
         |   runCMD(AssignCMD(a,b), scopes) = assignVar(a, eval(b,scopes), scopes)
+        |   runCMD(WhileCMD(a,b), scopes) = if(evalBool(a,scopes)) then (runCMDSeq(b, scopes); runCMD(WhileCMD(a,b), scopes)) else ()
 
     and runCMDSeq(empty, scopes) = ()
         |   runCMDSeq(cons(a,b), scopes) = (runCMD(a, scopes); runCMDSeq(b, scopes))

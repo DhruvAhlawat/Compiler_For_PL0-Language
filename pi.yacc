@@ -20,7 +20,7 @@ fun printScopeNumbers(block(decSeq(_,a),b,c,d)) =
 | RATADD | RATSUB | RATMUL | RATDIV | FALSE | TRUE
 | NUMBA of string | DISPLAY | EOL | EOF | DECI of string | SHOWDECIMAL | PRINT | READ 
 | AND | OR | NOT | LT | LEQ | GT | GEQ | NEQ | EQ 
-| IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE | ASSIGN
+| IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE | ASSIGN | CALL | WHILE | DO | OD 
 
 %nonterm exp of EXP  
 | Program | Block of BLOCK| command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
@@ -130,5 +130,7 @@ command : IF boolExp THEN commandSeq ELSE commandSeq FI (ConditionalCMD(boolExp,
     |   PRINT LPAREN boolExp RPAREN(PrintBool(boolExp))
     |   LPAREN command RPAREN (command)
     |   IDENT ASSIGN exp (AssignCMD(IDENT, exp))
-    |   IDENT ASSIGN boolExp (AssignBoolCMD(IDENT, boolExp))
+    |   IDENT ASSIGN boolExp (AssignBoolCMD(IDENT, boolExp)) 
+    |   WHILE boolExp DO commandSeq OD (WhileCMD(boolExp, commandSeq))
+    |   CALL IDENT (CallCMD(IDENT))
 

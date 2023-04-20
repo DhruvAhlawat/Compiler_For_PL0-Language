@@ -2,13 +2,17 @@ open DataTypes
 
 val scopeNumber = ref ~1;
 
-fun printScopeNumbers(block(a,b,c)) = 
+fun printScopeNumbers(block(decSeq(_,a),b,c,d)) = 
     let
         fun psn([]) = ()
-        |   psn(x::xs) = (print(Int.toString(x)^"\n"); psn(xs));
+        |   psn(x::xs) = (print(Int.toString(x)^" "); psn(xs));
+        fun helper(emptyDec) = []
+        |   helper(procDecls(procDef(f,b),h))  = (print(f); printScopeNumbers(b); helper(h))
     in
-        psn(c)
+        (print(":"^(Int.toString(c))^" = "); psn(!d); print("\n"); helper(a))
     end;
+
+
 
 %%
 %name Pi
@@ -16,7 +20,7 @@ fun printScopeNumbers(block(a,b,c)) =
 | RATADD | RATSUB | RATMUL | RATDIV | FALSE | TRUE
 | NUMBA of string | DISPLAY | EOL | EOF | DECI of string | SHOWDECIMAL | PRINT | READ 
 | AND | OR | NOT | LT | LEQ | GT | GEQ | NEQ | EQ 
-| IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE
+| IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE | ASSIGN
 
 %nonterm exp of EXP  
 | Program | Block of BLOCK| command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
@@ -50,9 +54,9 @@ fun printScopeNumbers(block(a,b,c)) =
 
 %%
     (*Program: commandSeq (runCMDSeq(commandSeq))*)
-Program : Block (scopeNumber := ~1; printScopeNumbers(Block))
+Program : Block (assignBlockScopes(Block, [])  ;printScopeNumbers(Block); scopeNumber := ~1)
 
-Block : DeclarationSeq commandSeq (scopeNumber := !scopeNumber + 1; block(DeclarationSeq, commandSeq, !scopeNumber:: getChildrenScopes(DeclarationSeq)))
+Block : DeclarationSeq commandSeq (scopeNumber := !scopeNumber + 1; block(DeclarationSeq, commandSeq, !scopeNumber, ref []))
      
 
 DeclarationSeq : VarDecls ProcDecls (decSeq(VarDecls, ProcDecls)) 
@@ -124,4 +128,6 @@ command : IF boolExp THEN commandSeq ELSE commandSeq FI (ConditionalCMD(boolExp,
     |   PRINT LPAREN exp RPAREN (PrintCMD(exp))
     |   PRINT LPAREN boolExp RPAREN(PrintBool(boolExp))
     |   LPAREN command RPAREN (command)
+    |   IDENT ASSIGN exp (AssignCMD(IDENT, exp))
+    |   IDENT ASSIGN boolExp (AssignBoolCMD(IDENT, boolExp))
 

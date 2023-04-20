@@ -1,8 +1,12 @@
-Procedure f
+procedure f
 procedure b
+{
+    (* hello world, this is a commetn*)
+};
 {
 
 };
+procedure c
 {
 
 };

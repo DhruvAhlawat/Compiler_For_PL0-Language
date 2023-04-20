@@ -1,4 +1,5 @@
 (* use "rational.sml"; *)
+open SymbolTable
 structure DataTypes =
 struct
     datatype EXP= 
@@ -15,7 +16,7 @@ struct
         | gt of EXP * EXP | leq of EXP * EXP | geq of EXP * EXP | beq of BOOLEXP * BOOLEXP | bneq of BOOLEXP * BOOLEXP;
 
     datatype COMMANDSEQ = empty | cons of COMMAND * COMMANDSEQ
-    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ | PrintBool of BOOLEXP
+    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ | PrintBool of BOOLEXP | AssignCMD of string * EXP | AssignBoolCMD  of string * BOOLEXP
 
     (* type PROCDEF = string*COMMANDSEQ *)
 
@@ -24,28 +25,34 @@ struct
     datatype VARDEC = boolean of string | rational of string | integer of string
     type VARDECSEC = VARDEC list
 
-    datatype BLOCK = block of DECSEQ * COMMANDSEQ * int list (*the int list is for the list of children nodes*)
+    datatype BLOCK = block of DECSEQ * COMMANDSEQ * int * int list ref (*the int list is for the list of children nodes*)
     and DECSEQ = decSeq of VARDECSEC * PROCDECLS 
     and PROCDECLS =  emptyDec | procDecls of PROCDEF * PROCDECLS 
     and PROCDEF = procDef of string * BLOCK 
 
-    (*this is used when declaring the scopes*)
-    fun getChildrenScopes(decSeq(d,e)) = 
-    let
-        fun helper(emptyDec) = []
-        |   helper(procDecls(procDef(f,block(a,b,c)),h))  = c@(helper(h))
-    in
-        (helper(e))
-    end
 
-    (* fun getChildrenScopes(decSeq(d,e)) = 
+    fun declareVariables(L, scopeNumber) =
     let
-        fun helper(emptyDec) = []
-        |   helper(procDecls(procDef(f,g),h))  = (getChildrenScopes(g))@(helper(h))
+        fun helper([]) = ()
+        |   helper(rational(a) :: h) = SymbolTable.declareVar(a, DataTypes.ratType(Rational.fromDecimal("0.0(0)")), scopeNumber)
+        |   helper(integer(a) :: h) = SymbolTable.declareVar(a, DataTypes.intType(BigInt.getBigInt("0")), scopeNumber)
+        |   helper(boolean(a) :: h) = SymbolTable.declareVar(a, DataTypes.boolType(false), scopeNumber)
     in
-        c@(helper(e))
-    end *)
+        helper(L)
+    end;
+    
+
+
+    fun assignBlockScopes(block(decSeq(_,a),_,curScope,L), parentScopes) = 
+        let
+            fun helper(emptyDec) = []
+            |   helper(procDecls(procDef(f,b),h))  = (assignBlockScopes(b,curScope::parentScopes); helper(h))
+        in
+            (L := parentScopes; helper(a))
+        end;
         
+
+
     exception typeMismatched;
     exception divisionByZeroError;
     
@@ -130,10 +137,12 @@ struct
             in 
                 (printHelper(b); print("\n")) (*printing a new line for ease of viewing printed text*) (*perhaps gotta CHANGE since no newline prints were mentioned in assighnment*)
             end
-    |   runCMD(PrintBool(a)) = (print(Bool.toString(evalBool(a))); print("\n"))
-    |   runCMD(ConditionalCMD(a,b,c)) = if (evalBool(a)) then runCMDSeq(b) else runCMDSeq(c)
+        |   runCMD(PrintBool(a)) = (print(Bool.toString(evalBool(a))); print("\n"))
+        |   runCMD(ConditionalCMD(a,b,c)) = if (evalBool(a)) then runCMDSeq(b) else runCMDSeq(c)
+        |   runCMD(AssignCMD(a,b)) = SymbolTable.assignVar()
 
     and runCMDSeq(empty) = ()
-    |   runCMDSeq(cons(a,b)) = (runCMD(a); runCMDSeq(b))
+        |   runCMDSeq(cons(a,b)) = (runCMD(a); runCMDSeq(b))
+
 
 end;

@@ -28,6 +28,8 @@ fun containsDecimal(x:string) =
 
 alpha = [A-Za-z];
 num = [0-9.~()];
+allAscii = . | "\n";
+comments = "(*" {allAscii}* "*)";
 integer=[~]?[0-9]+;
 deci = [~]?[0-9]*\.[0-9]+ | [~]?[0-9]*\.[0-9]*\([0-9]+\);
 alphanum = [0-9a-zA-Z];
@@ -44,10 +46,12 @@ spaces = [\ \t];
 "}" => (T.RBRACE(!lin,!col));
 "," => (T.COMMA(!lin,!col));
 
+
 "procedure" => (T.PROCEDURE(!lin,!col));
 "rational" => (T.RATIONAL(!lin,!col));
 "integer" => (T.INTEGER(!lin,!col));
 "boolean" => (T.BOOLEAN(!lin,!col));
+":=" => (T.ASSIGN(!lin,!col));
 
 "&&" => (T.AND(!lin,!col));
 "||" => (T.OR(!lin,!col));
@@ -79,4 +83,5 @@ spaces = [\ \t];
 {integer} => (T.NUMBA(yytext,!lin,!col));
 {deci} => (T.DECI(yytext,!lin,!col));
 {alpha}{alphanum}* => (T.IDENT(yytext,!lin,!col));
+{comments} => (continue());
 . => (print("unmatched character typed "^yytext^"\n"); continue());

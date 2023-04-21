@@ -1,12 +1,11 @@
-integer a,b, maxVal;
+integer a,b,c;
+procedure myProc
 {
-    maxVal := 15;
-    a := 1;
-    b := 1;
-    while(a < maxVal)
-    do {
-        a := a + 1;
-        b := b * a;
-        print(b);
-    } od;
+    print(a);
+};
+{
+    print(a);
+    a := 10;
+    print(!a<>10);
+    call myProc;
 }

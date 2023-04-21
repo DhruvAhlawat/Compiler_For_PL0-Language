@@ -75,6 +75,7 @@ spaces = [\ \t];
 
 "false" => (T.FALSE(!lin,!col));
 "true" => (T.TRUE(!lin,!col));
+"call" => (T.CALL(!lin,!col));
 
 "\n"  => (lin:= !lin + 1; continue());
 ";" => (T.EOL(!lin,!col));  

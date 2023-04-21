@@ -61,6 +61,17 @@ struct
         in
             HashTable.insert varMap  (name, (exp, scope)::varList)
         end
+    
+    fun undeclareVar (name:string, exp:EXP, scope:int) = 
+        let
+            val varList = 
+            case HashTable.find varMap name of
+                NONE => []
+                | SOME l => l
+        in
+            HashTable.insert varMap  (name, tl(varList))
+        end
+
 
     (*This function removes the previous instance of the variable in the symbol table so we can append the new value to it*)
     fun findAndRemovePreviousVarValue(a, b) = 
@@ -124,12 +135,22 @@ struct
         in
             helper(L)
         end;
+    fun undeclareVariables(L, scopeNumber) =
+        let
+            fun helper([]) = ()
+            |   helper(rational(a) :: h) = (undeclareVar(a, ratType(Rational.fromDecimal("0.0(0)")), scopeNumber); helper(h))
+            |   helper(integer(a) :: h) = (undeclareVar(a, intType(BigInt.getBigInt("0")), scopeNumber); helper(h))
+            |   helper(boolean(a) :: h) = (undeclareVar(a, boolType(false), scopeNumber); helper(h))
+        in
+            helper(L)
+        end;
         
     fun declareProcedures(emptyDec, scopeNumber) = () (*do nothing incase no procedures declared*)
         |   declareProcedures(procDecls(procDef(f,b),h), scopeNumber) = 
             (declareProc(f, procDef(f,b), scopeNumber); declareProcedures(h, scopeNumber)) 
 (*end of symbolTable Stuff*)
 
+    
 
 
     fun assignBlockScopes(block(decSeq(_,a),_,curScope,L), parentScopes) = 
@@ -144,6 +165,7 @@ struct
 
     exception typeMismatched;
     exception divisionByZeroError;
+    exception procedureNotDeclared;
     
     fun Add (intType(a),intType(b)) = intType(BigInt.add(a,b)) 
         |   Add (_,_) = raise typeMismatched;
@@ -216,9 +238,27 @@ struct
 
 
     
+    fun CallProcedure(name:string, parentScopes) = 
+        let
+            val procNamedList = HashTable.lookup procMap name
+            fun findProc(procList, scope) = 
+            case procList of
+                [] => NONE
+                | (proc, procScope)::rest => if (procScope = scope) then SOME(proc) else findProc(rest, scope)
+            val curScopeList = parentScopes;
+
+            fun checkAllScopes([]) = raise procedureNotDeclared
+            |   checkAllScopes(cur :: rest) = 
+                case findProc(procNamedList, cur) of
+                    NONE => checkAllScopes(rest)
+                    | SOME(proc) => proc
+            
+            val procDef(procName, blk) = checkAllScopes(curScopeList); (*this returns the procedure defined in the smallest enclosing scope*)
+        in
+            runBlock(blk)
+        end
     
-    
-    fun runCMD(PrintCMD(a), scopes) = 
+    and runCMD(PrintCMD(a), scopes) = 
         let 
             val b = eval(a,scopes); 
             fun printHelper(intType(a)) = print(implode (a))
@@ -231,15 +271,17 @@ struct
         |   runCMD(ConditionalCMD(a,b,c), scopes) = if (evalBool(a, scopes)) then runCMDSeq(b, scopes) else runCMDSeq(c, scopes)
         |   runCMD(AssignCMD(a,b), scopes) = assignVar(a, eval(b,scopes), scopes)
         |   runCMD(WhileCMD(a,b), scopes) = if(evalBool(a,scopes)) then (runCMDSeq(b, scopes); runCMD(WhileCMD(a,b), scopes)) else ()
+        |   runCMD(CallCMD(a), scopes) = CallProcedure(a, scopes)
 
     and runCMDSeq(empty, scopes) = ()
         |   runCMDSeq(cons(a,b), scopes) = (runCMD(a, scopes); runCMDSeq(b, scopes))
 
-    fun runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
+    and runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
         let
             
         in
-            (declareVariables(a,curScope); declareProcedures(b,curScope); runCMDSeq(c,curScope::(!parentScopes)))
+            (declareVariables(a,curScope); declareProcedures(b,curScope); 
+            runCMDSeq(c,curScope::(!parentScopes)); undeclareVariables(a,curScope))
         end;
 end;
 

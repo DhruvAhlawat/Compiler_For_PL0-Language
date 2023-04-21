@@ -23,7 +23,7 @@ fun printScopeNumbers(block(decSeq(_,a),b,c,d)) =
 | IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE | ASSIGN | CALL | WHILE | DO | OD 
 
 %nonterm exp of EXP  
-| Program | Block of BLOCK| command of COMMAND | WhileCmd | boolExp of BOOLEXP | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
+| Program | Block of BLOCK| command of COMMAND | WhileCmd | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
 | VarDecls of VARDECSEC | RatVarDecls of VARDECSEC | IntVarDecls of VARDECSEC  | BoolVarDecls of VARDECSEC 
 | RatIDlist of VARDECSEC | IntIDlist of VARDECSEC | BoolIDlist of VARDECSEC
 | ProcDecls of PROCDECLS | ProcDef of PROCDEF| DeclarationSeq of DECSEQ
@@ -94,22 +94,36 @@ exp : exp ADD exp (int(add(exp1, exp2)))
     | DECI (ratType(Rational.fromDecimal(DECI)))
     | LPAREN exp RPAREN (exp)
     | IDENT (var(IDENT))
+
+    | exp AND exp (bool(andOp(exp1, exp2)))
+    | exp OR exp (bool(orOp(exp1, exp2)))
+    | NOT exp (bool(notOp(exp)))
+    | exp EQ exp (bool(eq(exp1, exp2)))
+    | exp NEQ exp (bool(neq(exp1, exp2)))
+    | exp LT exp (bool(lt(exp1, exp2)))
+    | exp LEQ exp (bool(leq(exp1, exp2)))
+    | exp GT exp (bool(gt(exp1, exp2)))
+    | exp GEQ exp (bool(geq(exp1, exp2)))
+    | TRUE (boolType(true))
+    | FALSE (boolType(false))
+
+
     
 
-boolExp: boolExp AND boolExp (andOp(boolExp1, boolExp2))
-        | boolExp OR boolExp (orOp(boolExp1, boolExp2))
-        | NOT boolExp (notOp(boolExp))
-        | exp EQ exp (eq(exp1, exp2))
-        | exp NEQ exp (neq(exp1, exp2))
-        | exp LT exp (lt(exp1, exp2))
-        | exp LEQ exp (leq(exp1, exp2))
-        | exp GT exp (gt(exp1, exp2))
-        | exp GEQ exp (geq(exp1, exp2))
-        | LPAREN boolExp RPAREN (boolExp)
-        | TRUE (TRUE)
-        | FALSE (FALSE)
-        | boolExp EQ boolExp (beq(boolExp1, boolExp2))
-        | boolExp NEQ boolExp (bneq(boolExp1, boolExp2))
+        (*boolExp: boolExp AND boolExp (andOp(boolExp1, boolExp2))
+                | boolExp OR boolExp (orOp(boolExp1, boolExp2))
+                | NOT boolExp (notOp(boolExp))
+                | exp EQ exp (eq(exp1, exp2))
+                | exp NEQ exp (neq(exp1, exp2))
+                | exp LT exp (lt(exp1, exp2))
+                | exp LEQ exp (leq(exp1, exp2))
+                | exp GT exp (gt(exp1, exp2))
+                | exp GEQ exp (geq(exp1, exp2))
+                | LPAREN boolExp RPAREN (boolExp)
+                | TRUE (TRUE)
+                | FALSE (FALSE)
+                | boolExp EQ boolExp (beq(boolExp1, boolExp2))
+                | boolExp NEQ boolExp (bneq(boolExp1, boolExp2))*)
 
 
 
@@ -125,12 +139,10 @@ commandSeq : LBRACE command EOL comSeqInBrace RBRACE (cons(command,comSeqInBrace
 comSeqInBrace : command EOL comSeqInBrace (cons(command, comSeqInBrace))
            |    (empty)
 
-command : IF boolExp THEN commandSeq ELSE commandSeq FI (ConditionalCMD(boolExp, commandSeq1, commandSeq2))
+command : IF exp THEN commandSeq ELSE commandSeq FI (ConditionalCMD(exp, commandSeq1, commandSeq2))
     |   PRINT LPAREN exp RPAREN (PrintCMD(exp))
-    |   PRINT LPAREN boolExp RPAREN(PrintBool(boolExp))
     |   LPAREN command RPAREN (command)
     |   IDENT ASSIGN exp (AssignCMD(IDENT, exp))
-    |   IDENT ASSIGN boolExp (AssignBoolCMD(IDENT, boolExp)) 
-    |   WHILE boolExp DO commandSeq OD (WhileCMD(boolExp, commandSeq))
+    |   WHILE exp DO commandSeq OD (WhileCMD(exp, commandSeq))
     |   CALL IDENT (CallCMD(IDENT))
 

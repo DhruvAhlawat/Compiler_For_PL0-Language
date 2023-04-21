@@ -1,4 +1,4 @@
-boolean ACalledTwice;
+integer ACalledTwice;
 procedure first
     integer a;
     procedure second
@@ -7,11 +7,10 @@ procedure first
     };
 {
     a:= 0;
-    if(! ACalledTwice) then
+    if(ACalledTwice = 0) then
     {
-        ACalledTwice := true;
+        ACalledTwice := 1;
         call first;
-        
     }
     else
     {
@@ -22,6 +21,6 @@ procedure first
 };
 {
 
-    ACalledTwice := false;
+    ACalledTwice := 0;
     call first;
 }

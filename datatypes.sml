@@ -7,18 +7,17 @@ struct
                   add of EXP * EXP | sub of EXP * EXP | mul of EXP * EXP | divOp of EXP * EXP 
                 |   ratadd of EXP * EXP | ratsub of EXP * EXP | ratmul of EXP * EXP | ratdivOp of EXP * EXP
                 | modOp of EXP * EXP    
-                | int of EXP |  rat of EXP 
+                | int of EXP |  rat of EXP | bool of EXP
                 (* | bool of EXP | eq of EXP*EXP | neq of EXP*EXP | andOp of EXP*EXP | lt of EXP*EXP *)
-                | var of string | intType of BigInt.bigint | ratType of Rational.rational
-                | STRING of string | CHAR of char | boolType of bool;
-    
-    datatype BOOLEXP = eq of EXP*EXP | neq of EXP*EXP | andOp of BOOLEXP*BOOLEXP 
-        | orOp of BOOLEXP*BOOLEXP | notOp of BOOLEXP | TRUE | FALSE | lt of EXP * EXP 
-        | gt of EXP * EXP | leq of EXP * EXP | geq of EXP * EXP | beq of BOOLEXP * BOOLEXP | bneq of BOOLEXP * BOOLEXP;
+                | var of string | intType of BigInt.bigint | ratType of Rational.rational | boolType of bool 
+                | eq of EXP*EXP | neq of EXP*EXP | andOp of EXP*EXP 
+                | orOp of EXP*EXP | notOp of EXP | TRUE | FALSE | lt of EXP * EXP 
+                | gt of EXP * EXP | leq of EXP * EXP | geq of EXP * EXP 
+            
 
     datatype COMMANDSEQ = empty | cons of COMMAND * COMMANDSEQ
-    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of BOOLEXP * COMMANDSEQ * COMMANDSEQ | PrintBool of BOOLEXP 
-    | AssignCMD of string * EXP | AssignBoolCMD  of string * BOOLEXP | WhileCMD of BOOLEXP * COMMANDSEQ | CallCMD of string 
+    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of EXP * COMMANDSEQ * COMMANDSEQ | PrintBool of EXP 
+    | AssignCMD of string * EXP | AssignBoolCMD  of string * EXP | WhileCMD of EXP * COMMANDSEQ | CallCMD of string 
 
     (* type PROCDEF = string*COMMANDSEQ *)
 
@@ -33,13 +32,15 @@ struct
     and PROCDEF = procDef of string * BLOCK 
 
 (*Symbol table stuff*)
-    type VarSymbol = EXP * int(*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
+    type VarSymbol = EXP * int      (*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
     type ProcSymbol = PROCDEF * int (*EXP denotes the type of the variable along with its value, whereas int stores the scope of the variable*)
-
+    (* type VarBool = BOOLEXP * int    BOOLEXP denotes the type of the variable along with its value, whereas int stores the scope of the variable *)
     exception VariableNotDeclared;
     exception VarIncorrectTypeOrNotDeclared;
     val varMap : (string, VarSymbol list) HashTable.hash_table = HashTable.mkTable(HashString.hashString, op=)(50, Fail "not declared")
     val procMap : (string, ProcSymbol list) HashTable.hash_table = HashTable.mkTable(HashString.hashString, op=)(50, Fail "not declared")
+    (* val boolMap : (string, bool) HashTable.hash_table = HashTable.mkTable(HashString.hashString, op=)(50, Fail "not declared") *)
+
 
     fun declareProc (name:string, proc:PROCDEF, scope:int) = 
         let
@@ -50,7 +51,15 @@ struct
         in
             HashTable.insert procMap  (name, ((proc, scope):ProcSymbol )::procList)
         end
-
+    fun undeclareProc (name:string, proc:PROCDEF, scope:int) = 
+        let
+            val procList = 
+            case HashTable.find procMap name of
+                NONE => []
+                | SOME l => l
+        in
+            HashTable.insert procMap  (name, tl(procList))
+        end
 
     fun declareVar (name:string, exp:EXP, scope:int) = 
         let
@@ -74,6 +83,26 @@ struct
 
 
     (*This function removes the previous instance of the variable in the symbol table so we can append the new value to it*)
+    (* fun declareBool (name:string, exp:BOOLEXP, scope:int) = 
+        let
+            val varList = 
+            case HashTable.find boolMap name of
+                NONE => []
+                | SOME l => l
+        in
+            HashTable.insert boolMap  (name, (exp, scope)::varList)
+        end
+
+    fun undeclareBool (name:string, exp:BOOLEXP, scope:int) = 
+        let
+            val varList = 
+            case HashTable.find boolMap name of
+                NONE => []
+                | SOME l => l
+        in
+            HashTable.insert boolMap  (name, tl(varList))
+        end *)
+    
     fun findAndRemovePreviousVarValue(a, b) = 
         let 
             fun findMatchingScope(((b,a):VarSymbol):: t, L , reqScope:int) = if(reqScope = a) then SOME((L@t, b))
@@ -118,6 +147,7 @@ struct
                     | SOME (l, prevExp) => (  case (prevExp, exp) of 
                             (intType(_), intType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
                             | (ratType(_), ratType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
+                            | (boolType(_), boolType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
                             | (_,_) => raise   VarIncorrectTypeOrNotDeclared)   
                             (*if we found a matching scope, then its previous value would have been deleted so we insert a new exp,scope in l and put it in the hashmap*)
                     
@@ -148,6 +178,9 @@ struct
     fun declareProcedures(emptyDec, scopeNumber) = () (*do nothing incase no procedures declared*)
         |   declareProcedures(procDecls(procDef(f,b),h), scopeNumber) = 
             (declareProc(f, procDef(f,b), scopeNumber); declareProcedures(h, scopeNumber)) 
+    fun undeclareProcedures(emptyDec, scopeNumer) = ()
+    |   undeclareProcedures(procDecls(procDef(f,b),h), scopeNumber) = 
+        (undeclareProc(f, procDef(f,b), scopeNumber); undeclareProcedures(h, scopeNumber))
 (*end of symbolTable Stuff*)
 
     
@@ -200,9 +233,12 @@ struct
         case (a,b) of
             (intType(a),intType(b)) =>  (BigInt.leq(a,b) = 2)
         |   (ratType(a),ratType(b)) =>  ((Rational.equal(a,b)))
+        |   (boolType(a),boolType(b)) =>  (a = b)
         |   _ => raise typeMismatched
    
         
+    fun getBoolOut(boolType(a)) = a
+    |   getBoolOut(_) = raise typeMismatched;
 
 
     fun eval((intType a, c) | (int(intType a),c)) = intType (a)
@@ -217,24 +253,23 @@ struct
         |   eval(int(divOp(a,b)),c) = Div(eval(a,c),eval(b,c))
         |   eval(int(modOp(a,b)),c) = Mod(eval(a,c),eval(b,c))
         |   eval(var(a),c) = getVarVal(a,c)
+        |   eval(boolType(false),c) = boolType(false)
+        |   eval(bool(boolType(a)),c) = boolType(a)
+        |   eval(boolType(true),c) = boolType(true)
+        |   eval(bool(eq(a,b)),c) = boolType(isEqual(eval(a,c),eval(b,c)))
+        |   eval(bool(neq(a,b)),c) = boolType(not (isEqual(eval(a,c),eval(b,c))))
+        |   eval(bool(andOp(a,b)),c) = boolType(getBoolOut(eval(a,c)) andalso getBoolOut(eval(b,c)))
+        |   eval(bool(orOp(a,b)),c) = boolType(getBoolOut(eval(a,c)) orelse getBoolOut(eval(b,c)))
+        |   eval(bool(notOp(a)),c) = boolType(not (getBoolOut(eval(a,c))))
+        |   eval(bool(lt(a,b)),c) = boolType(lessThan(eval(a,c),eval(b,c)))
+        |   eval(bool(gt(a,b)),c) = boolType(greaterThan(eval(a,c),eval(b,c)))
+        |   eval(bool(leq(a,b)),c) = boolType(not (greaterThan(eval(a,c),eval(b,c))))
+        |   eval(bool(geq(a,b)),c) = boolType(not (lessThan(eval(a,c),eval(b,c))))
+       
+            
         (* |   eval((boolType a) | bool(boolType a)) = boolType (a)
         |   eval(bool(lt(a,b))) = boolType(lessThan(eval(a),eval(b))) *)
-    
-   
 
-    fun evalBool(TRUE,scopes) = true
-        |   evalBool(FALSE,scopes) = false
-        |   evalBool(eq(a,b),scopes) =  isEqual(eval(a,scopes),eval(b,scopes))
-        |   evalBool(neq(a,b),scopes) = not (evalBool(eq(a,b),scopes))
-        |   evalBool(andOp(a,b),scopes) = (evalBool(a,scopes) andalso evalBool(b,scopes))
-        |   evalBool(orOp(a,b),scopes) = (evalBool(a,scopes) orelse evalBool(b,scopes))
-        |   evalBool(notOp(a),scopes) = (not (evalBool(a,scopes)))
-        |   evalBool(lt(a,b),scopes) = lessThan(eval(a,scopes),eval(b,scopes))
-        |   evalBool(gt(a,b),scopes) = greaterThan(eval(a,scopes),eval(b,scopes))
-        |   evalBool(leq(a,b),scopes) =  let val A = eval(a,scopes); val B = eval(b,scopes); in (lessThan(A,B) orelse (A = B)) end
-        |   evalBool(geq(a,b),scopes) =  not (lessThan(eval(a,scopes),eval(b,scopes)))
-        |   evalBool(beq(a,b),scopes) = (evalBool(a, scopes) = evalBool(b, scopes))
-        |   evalBool(bneq(a,b),scopes) = not (evalBool(a, scopes) = evalBool(b, scopes))
 
 
     
@@ -267,10 +302,10 @@ struct
             in 
                 (printHelper(b); print("\n")) (*printing a new line for ease of viewing printed text*) (*perhaps gotta CHANGE since no newline prints were mentioned in assighnment*)
             end
-        |   runCMD(PrintBool(a), scopes) = (print(Bool.toString(evalBool(a,scopes))); print("\n"))
-        |   runCMD(ConditionalCMD(a,b,c), scopes) = if (evalBool(a, scopes)) then runCMDSeq(b, scopes) else runCMDSeq(c, scopes)
+        (* |   runCMD(PrintBool(a), scopes) = (print(Bool.toString(evalBool(a,scopes))); print("\n")) *)
+        |   runCMD(ConditionalCMD(a,b,c), scopes) = if (getBoolOut(eval(a, scopes))) then runCMDSeq(b, scopes) else runCMDSeq(c, scopes)
         |   runCMD(AssignCMD(a,b), scopes) = assignVar(a, eval(b,scopes), scopes)
-        |   runCMD(WhileCMD(a,b), scopes) = if(evalBool(a,scopes)) then (runCMDSeq(b, scopes); runCMD(WhileCMD(a,b), scopes)) else ()
+        |   runCMD(WhileCMD(a,b), scopes) = if(getBoolOut(eval(a,scopes))) then (runCMDSeq(b, scopes); runCMD(WhileCMD(a,b), scopes)) else ()
         |   runCMD(CallCMD(a), scopes) = CallProcedure(a, scopes)
 
     and runCMDSeq(empty, scopes) = ()
@@ -281,7 +316,7 @@ struct
             
         in
             (declareVariables(a,curScope); declareProcedures(b,curScope); 
-            runCMDSeq(c,curScope::(!parentScopes)); undeclareVariables(a,curScope))
+            runCMDSeq(c,curScope::(!parentScopes)); undeclareVariables(a,curScope); undeclareProcedures(b,curScope))
         end;
 end;
 

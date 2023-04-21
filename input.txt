@@ -1,27 +1,7 @@
-boolean ACalledTwice;
-procedure first
-    integer a;
-    procedure second
-    {
-        a := a + 10;
-    };
+rational aasad,b,c;
+integer d,e,f;
+boolean g,h,j;
 {
-    a:= 0;
-    if(! ACalledTwice) then
-    {
-        ACalledTwice := true;
-        call first;
-        
-    }
-    else
-    {
-        call second;
-    } fi;
-
-    print(a);
-};
-{
-
-    ACalledTwice := false;
-    call first;
+    read(aasad);
+    print(aasad.*.b);
 }

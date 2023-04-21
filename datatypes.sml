@@ -1,12 +1,14 @@
 (* use "rational.sml"; *)
 (* open SymbolTable *)
 (* use "symbolTable.sml" *)
+val cmdline = TextIO.stdIn; 
+
 structure DataTypes =
 struct
     datatype EXP= 
                   add of EXP * EXP | sub of EXP * EXP | mul of EXP * EXP | divOp of EXP * EXP 
                 |   ratadd of EXP * EXP | ratsub of EXP * EXP | ratmul of EXP * EXP | ratdivOp of EXP * EXP
-                | modOp of EXP * EXP    
+                | modOp of EXP * EXP | makeRat of EXP * EXP | inverse of EXP
                 | int of EXP |  rat of EXP | bool of EXP
                 (* | bool of EXP | eq of EXP*EXP | neq of EXP*EXP | andOp of EXP*EXP | lt of EXP*EXP *)
                 | var of string | intType of BigInt.bigint | ratType of Rational.rational | boolType of bool 
@@ -16,8 +18,9 @@ struct
             
 
     datatype COMMANDSEQ = empty | cons of COMMAND * COMMANDSEQ
-    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of EXP * COMMANDSEQ * COMMANDSEQ | PrintBool of EXP 
+    and  COMMAND =  PrintCMD of EXP | ConditionalCMD of EXP * COMMANDSEQ * COMMANDSEQ 
     | AssignCMD of string * EXP | AssignBoolCMD  of string * EXP | WhileCMD of EXP * COMMANDSEQ | CallCMD of string 
+    | PrintDecCMD of EXP | ReadCMD of string
 
     (* type PROCDEF = string*COMMANDSEQ *)
 
@@ -265,11 +268,38 @@ struct
         |   eval(bool(gt(a,b)),c) = boolType(greaterThan(eval(a,c),eval(b,c)))
         |   eval(bool(leq(a,b)),c) = boolType(not (greaterThan(eval(a,c),eval(b,c))))
         |   eval(bool(geq(a,b)),c) = boolType(not (lessThan(eval(a,c),eval(b,c))))
+        |   eval(rat(makeRat(a,b)),c) = 
+            let 
+                val aVal = eval(a,c)
+                val bVal = eval(b,c)
+            in
+                case (aVal,bVal) of
+                    (intType(a),intType(b)) => (ratType(valOf(Rational.make_rat(a,b)))) 
+                |   _ => raise typeMismatched
+            end
+        |   eval(rat(inverse(a)), c) = 
+            let
+                val b = eval(a,c);
+            in
+                case b of 
+                intType(d) => ratType(valOf(Rational.make_rat(BigInt.getBigInt("1"),d)))
+                | ratType(d) => ratType(valOf(Rational.inverse(d)))
+            end
+            
        
             
         (* |   eval((boolType a) | bool(boolType a)) = boolType (a)
         |   eval(bool(lt(a,b))) = boolType(lessThan(eval(a),eval(b))) *)
-
+    fun getRidOfTrailingNewLine(str) = 
+        let
+            val strList = explode str
+            fun removeTrailingNewLine([]) = []
+            |   removeTrailingNewLine([#"\n"]) = []
+            |   removeTrailingNewLine([x]) = [x]
+            |   removeTrailingNewLine(x::y::rest) = x::removeTrailingNewLine(y::rest)
+        in
+            implode(removeTrailingNewLine(strList))
+        end
 
 
     
@@ -302,14 +332,29 @@ struct
             in 
                 (printHelper(b); print("\n")) (*printing a new line for ease of viewing printed text*) (*perhaps gotta CHANGE since no newline prints were mentioned in assighnment*)
             end
+        |   runCMD(PrintDecCMD(a), scopes) =
+            let 
+                val b = eval(a,scopes); 
+            in
+            case b of 
+                ratType(c) => (print(Rational.toDecimal(c)); print("\n"))
+                |   _ => raise typeMismatched 
+            end
         (* |   runCMD(PrintBool(a), scopes) = (print(Bool.toString(evalBool(a,scopes))); print("\n")) *)
         |   runCMD(ConditionalCMD(a,b,c), scopes) = if (getBoolOut(eval(a, scopes))) then runCMDSeq(b, scopes) else runCMDSeq(c, scopes)
         |   runCMD(AssignCMD(a,b), scopes) = assignVar(a, eval(b,scopes), scopes)
         |   runCMD(WhileCMD(a,b), scopes) = if(getBoolOut(eval(a,scopes))) then (runCMDSeq(b, scopes); runCMD(WhileCMD(a,b), scopes)) else ()
         |   runCMD(CallCMD(a), scopes) = CallProcedure(a, scopes)
+        |   runCMD(ReadCMD(a),scopes) = 
+            let 
+                val SOME(value) = (print(a^":= ") ;TextIO.inputLine(TextIO.stdIn))
+                val readValue = getRidOfTrailingNewLine(value);
+            in
+                (assignVar(a, intType(BigInt.getBigInt(readValue)), scopes)) handle _ => (assignVar(a, ratType(Rational.fromDecimal(readValue)), scopes))
+            end
 
     and runCMDSeq(empty, scopes) = ()
-        |   runCMDSeq(cons(a,b), scopes) = (runCMD(a, scopes); runCMDSeq(b, scopes))
+        |   runCMDSeq(cons(a,b), scopes) = ((runCMD(a, scopes)) handle typeMismatched => print("raised typeMismatched. \n please type check your code again. \n"); runCMDSeq(b, scopes))
 
     and runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
         let

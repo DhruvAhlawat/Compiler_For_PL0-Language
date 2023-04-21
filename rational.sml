@@ -19,8 +19,6 @@ sig
     val toDecimal : rational -> string
     val showDecimal : rational -> string
     val parseTill : char list * char-> char list * char list
-
-
     val getFractionalParts : bigint*bigint*bigint list -> char list*int  
     
 
@@ -207,6 +205,7 @@ fun getBigInt("") = []
     let
         val ans = (explode a);
         fun isNumeric([]) = true
+        |   isNumeric(x :: [#"\n"]) = isNumeric([x]) (*incase the last character is of newLine*)
         |   isNumeric(x::y) = if(Char.ord(x) - Char.ord(#"0") >=0 andalso Char.ord(x) - Char.ord(#"0") <= 9) then isNumeric(y) else false;
     in 
         if(isNumeric ans orelse (hd(ans) = #"~" andalso isNumeric(tl(ans)))) then ans else raise unknownCharacter

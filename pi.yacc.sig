@@ -2,6 +2,12 @@ signature Pi_TOKENS =
 sig
 type ('a,'b) token
 type svalue
+val FROMDECIMAL:  'a * 'a -> (svalue,'a) token
+val MAKE_RAT:  'a * 'a -> (svalue,'a) token
+val RAT:  'a * 'a -> (svalue,'a) token
+val SHOWRAT:  'a * 'a -> (svalue,'a) token
+val SHOWDECIMAL:  'a * 'a -> (svalue,'a) token
+val TODECIMAL:  'a * 'a -> (svalue,'a) token
 val OD:  'a * 'a -> (svalue,'a) token
 val DO:  'a * 'a -> (svalue,'a) token
 val WHILE:  'a * 'a -> (svalue,'a) token
@@ -27,7 +33,6 @@ val OR:  'a * 'a -> (svalue,'a) token
 val AND:  'a * 'a -> (svalue,'a) token
 val READ:  'a * 'a -> (svalue,'a) token
 val PRINT:  'a * 'a -> (svalue,'a) token
-val SHOWDECIMAL:  'a * 'a -> (svalue,'a) token
 val DECI: (string) *  'a * 'a -> (svalue,'a) token
 val EOF:  'a * 'a -> (svalue,'a) token
 val EOL:  'a * 'a -> (svalue,'a) token
@@ -39,6 +44,8 @@ val RATDIV:  'a * 'a -> (svalue,'a) token
 val RATMUL:  'a * 'a -> (svalue,'a) token
 val RATSUB:  'a * 'a -> (svalue,'a) token
 val RATADD:  'a * 'a -> (svalue,'a) token
+val INVERSE:  'a * 'a -> (svalue,'a) token
+val VAR:  'a * 'a -> (svalue,'a) token
 val IDENT: (string) *  'a * 'a -> (svalue,'a) token
 val RBRACE:  'a * 'a -> (svalue,'a) token
 val LBRACE:  'a * 'a -> (svalue,'a) token

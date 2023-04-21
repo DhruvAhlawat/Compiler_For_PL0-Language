@@ -16,11 +16,12 @@ fun printScopeNumbers(block(decSeq(_,a),b,c,d)) =
 
 %%
 %name Pi
-%term LPAREN | RPAREN | DIV | MUL | ADD | SUB | MOD | LBRACE | RBRACE | IDENT of string 
+%term LPAREN | RPAREN | DIV | MUL | ADD | SUB | MOD | LBRACE | RBRACE | IDENT of string | VAR | INVERSE
 | RATADD | RATSUB | RATMUL | RATDIV | FALSE | TRUE
-| NUMBA of string | DISPLAY | EOL | EOF | DECI of string | SHOWDECIMAL | PRINT | READ 
+| NUMBA of string | DISPLAY | EOL | EOF | DECI of string | PRINT | READ 
 | AND | OR | NOT | LT | LEQ | GT | GEQ | NEQ | EQ 
 | IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE | ASSIGN | CALL | WHILE | DO | OD 
+| TODECIMAL | SHOWDECIMAL | SHOWRAT | RAT | MAKE_RAT | FROMDECIMAL
 
 %nonterm exp of EXP  
 | Program | Block of BLOCK| command of COMMAND | WhileCmd | commandSeq of COMMANDSEQ | comSeqInBrace of COMMANDSEQ
@@ -39,21 +40,26 @@ fun printScopeNumbers(block(decSeq(_,a),b,c,d)) =
 %arg (fileName) : string
 %start Program
 
+%left 
+%left PRINT READ CALL 
+%nonassoc ASSIGN
 %nonassoc EQ
-%nonassoc LT LEQ GT GEQ NEQ
-%nonassoc NOT
-%left IF THEN ELSE FI
+%left LT LEQ GT GEQ NEQ
+%nonassoc NOT TRUE FALSE
+%left IF THEN ELSE FI 
 %left OR
 %left AND 
 %left SHOWDECIMAL
 %left ADD SUB RATADD RATSUB
 %left DIV MUL RATMUL RATDIV MOD
 %left LPAREN RPAREN EOL
+%left PROCEDURE IDENT 
 %left LBRACE RBRACE
+%left RAT MAKE_RAT INVERSE
+%nonassoc RATIONAL INTEGER BOOLEAN COMMA
 
 
 %%
-    (*Program: commandSeq (runCMDSeq(commandSeq))*)
 Program : Block (assignBlockScopes(Block, [])  ; scopeNumber := ~1; runBlock(Block))
 
 Block : DeclarationSeq commandSeq (scopeNumber := !scopeNumber + 1; block(DeclarationSeq, commandSeq, !scopeNumber, ref []))
@@ -90,11 +96,17 @@ exp : exp ADD exp (int(add(exp1, exp2)))
     | exp DIV exp (int(divOp(exp1, exp2)))
     | exp RATDIV exp (rat(divOp(exp1, exp2)))
     | exp MOD exp (int(modOp(exp1, exp2)))
+    | INVERSE exp (rat(inverse(exp)))
     | NUMBA (intType(BigInt.getBigInt(NUMBA)))
+    | MAKE_RAT exp exp (rat(makeRat(exp1, exp2)))
+    | MAKE_RAT LPAREN exp COMMA exp RPAREN (rat(makeRat(exp1,exp2)))
+    | FROMDECIMAL DECI (ratType(Rational.fromDecimal(DECI)))
+    | FROMDECIMAL LPAREN DECI RPAREN (ratType(Rational.fromDecimal(DECI)))
+    | RAT exp (rat(makeRat(exp1, intType(BigInt.getBigInt("1")))))
     | DECI (ratType(Rational.fromDecimal(DECI)))
     | LPAREN exp RPAREN (exp)
     | IDENT (var(IDENT))
-
+    | VAR IDENT (var(IDENT))
     | exp AND exp (bool(andOp(exp1, exp2)))
     | exp OR exp (bool(orOp(exp1, exp2)))
     | NOT exp (bool(notOp(exp)))
@@ -126,13 +138,6 @@ exp : exp ADD exp (int(add(exp1, exp2)))
                 | boolExp NEQ boolExp (bneq(boolExp1, boolExp2))*)
 
 
-
-
-        (*commandSeq : LBRACE commandSequence  RBRACE (commandSequence)
-
-        commandSequence : command EOL commandSequence (command :: commandSequence1)
-                        | command EOL ([command])
-                        |   ([])*)
 commandSeq : LBRACE command EOL comSeqInBrace RBRACE (cons(command,comSeqInBrace))
             |   LBRACE RBRACE (empty)
 
@@ -140,9 +145,13 @@ comSeqInBrace : command EOL comSeqInBrace (cons(command, comSeqInBrace))
            |    (empty)
 
 command : IF exp THEN commandSeq ELSE commandSeq FI (ConditionalCMD(exp, commandSeq1, commandSeq2))
-    |   PRINT LPAREN exp RPAREN (PrintCMD(exp))
-    |   LPAREN command RPAREN (command)
-    |   IDENT ASSIGN exp (AssignCMD(IDENT, exp))
-    |   WHILE exp DO commandSeq OD (WhileCMD(exp, commandSeq))
-    |   CALL IDENT (CallCMD(IDENT))
+        |   PRINT LPAREN exp RPAREN (PrintCMD(exp))
+        |   PRINT LPAREN TODECIMAL exp RPAREN (PrintDecCMD(exp))
+        |   PRINT LPAREN SHOWDECIMAL exp RPAREN (PrintDecCMD(exp))
+        |   PRINT LPAREN SHOWRAT exp RPAREN (PrintCMD(exp))
+        |   LPAREN command RPAREN (command)
+        |   IDENT ASSIGN exp (AssignCMD(IDENT, exp))
+        |   WHILE exp DO commandSeq OD (WhileCMD(exp, commandSeq))
+        |   CALL IDENT (CallCMD(IDENT))
+        |   READ LPAREN IDENT RPAREN (ReadCMD(IDENT))
 

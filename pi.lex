@@ -52,6 +52,12 @@ spaces = [\ \t];
 "integer" => (T.INTEGER(!lin,!col));
 "boolean" => (T.BOOLEAN(!lin,!col));
 ":=" => (T.ASSIGN(!lin,!col));
+"toDecimal" => (T.TODECIMAL(!lin,!col));
+"fromDecimal" => (T.FROMDECIMAL(!lin,!col));
+"rat" => (T.RAT(!lin,!col));
+"make_rat" => (T.MAKE_RAT(!lin,!col));
+"showRat" => (T.SHOWRAT(!lin,!col));
+"showDecimal" => (T.SHOWDECIMAL(!lin,!col));
 
 "&&" => (col := !col + 2;T.AND(!lin,!col));
 "||" => (col := !col + 2;T.OR(!lin,!col));
@@ -73,10 +79,11 @@ spaces = [\ \t];
 "else" => (col := !col + 4;T.ELSE(!lin,!col));
 "print" => (col := !col + 5;T.PRINT(!lin,!col));
 "call" => (col := !col + 4;T.CALL(!lin,!col));
+"inverse" => (col := !col + 7;T.INVERSE(!lin,!col));
 
-
-"false" => (col := !col + 5;T.FALSE(!lin,!col));
-"true" => (col := !col + 4;T.TRUE(!lin,!col));
+"ff" => (col := !col + 2;T.FALSE(!lin,!col));
+"tt" => (col := !col + 2;T.TRUE(!lin,!col));
+"var" => (col := !col + 3;T.VAR(!lin,!col));
 
 "\n"  => (lin:= !lin + 1; continue());
 ";" => (col := !col + 1;T.EOL(!lin,!col));  

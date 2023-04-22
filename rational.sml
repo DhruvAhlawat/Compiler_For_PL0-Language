@@ -40,6 +40,7 @@ signature BIGINT =
     val GCD : bigint*bigint -> bigint
     val LCM : bigint*bigint -> bigint    
     val stripZeros : bigint -> bigint
+    val neg : bigint -> bigint
 end;
 
 structure BigInt : BIGINT =
@@ -55,7 +56,10 @@ exception unknownCharacter
     fun reverse(x,z) = if null(x) then z
     else reverse(tl(x),hd(x)::z); 
     
-
+    fun neg([#"0"]) = [#"0"]
+    |   neg([#"~",#"0"]) = [#"0"]
+    |   neg(a::b) = if (a = #"~") then b else #"~"::a::b
+    
     val zeroVal : int = Char.ord(#"0"); 
     fun rev x = reverse(x,[]);   
 
@@ -409,7 +413,7 @@ functor makeRational (bi : BIGINT): RATIONAL =
     let
         val (ans,left) = (parseTill(c,b))
     in
-        (a::ans,left)
+        if(Char.isDigit(a)) then (a::ans,left) else raise rat_error
     end
 
 

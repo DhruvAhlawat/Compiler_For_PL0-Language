@@ -17,7 +17,7 @@ fun printScopeNumbers(block(decSeq(_,a),b,c,d)) =
 %%
 %name Pi
 %term LPAREN | RPAREN | DIV | MUL | ADD | SUB | MOD | LBRACE | RBRACE | IDENT of string | VAR | INVERSE
-| RATADD | RATSUB | RATMUL | RATDIV | FALSE | TRUE
+| RATADD | RATSUB | RATMUL | RATDIV | FALSE | TRUE | NEG
 | NUMBA of string | DISPLAY | EOL | EOF | DECI of string | PRINT | READ 
 | AND | OR | NOT | LT | LEQ | GT | GEQ | NEQ | EQ 
 | IF | THEN | ELSE | FI | RATIONAL | INTEGER | BOOLEAN | COMMA | PROCEDURE | ASSIGN | CALL | WHILE | DO | OD 
@@ -52,6 +52,7 @@ fun printScopeNumbers(block(decSeq(_,a),b,c,d)) =
 %left SHOWDECIMAL
 %left ADD SUB RATADD RATSUB
 %left DIV MUL RATMUL RATDIV MOD
+%left NEG
 %left LPAREN RPAREN EOL
 %left PROCEDURE IDENT 
 %left LBRACE RBRACE
@@ -106,6 +107,7 @@ exp : exp ADD exp (int(add(exp1, exp2)))
     | DECI (ratType(Rational.fromDecimal(DECI)))
     | LPAREN exp RPAREN (exp)
     | IDENT (var(IDENT))
+    | NEG exp ((neg(exp)))
     | VAR IDENT (var(IDENT))
     | exp AND exp (bool(andOp(exp1, exp2)))
     | exp OR exp (bool(orOp(exp1, exp2)))

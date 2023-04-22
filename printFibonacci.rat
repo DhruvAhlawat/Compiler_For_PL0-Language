@@ -1,0 +1,18 @@
+integer a,b,maxVal;
+    procedure fibonacci
+    integer temp;
+    {
+        temp := a;
+        a := a + b;
+        b := temp; (*this is fibonacci as a -> (a+b) and b -> a*)
+        print(a);
+    };
+{
+    read(maxVal); a := 1; b := 1;
+    while(maxVal > 0) do
+    {
+        call fibonacci;
+        maxVal := maxVal - 1;
+    } od;
+}
+ 

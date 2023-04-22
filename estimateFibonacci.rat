@@ -1,0 +1,81 @@
+rational final;
+integer a,b,maxVal;
+boolean shouldRunEstimateToo;
+    procedure iterativeFibonacci (*this procedure solves for the correct fibonacci term using iteration*)
+    integer temp, n; 
+    {
+        n := maxVal;
+        while(n > 2) do
+        {
+            temp := a;
+            a := a + b;
+            b := temp;  
+            n := n - 1;
+        } od;
+    };
+
+    procedure estimateFibonacci (*this procedure estimates fibonacci through its general formula.
+    'estimate' because the square root of 5 is estimated (or equivalently phi)*)
+    rational phi, xn, invPhi, sqrt5;
+    integer raiseTo, n;
+    boolean raisePhi;
+        procedure power (*this procedure raises phi or invPhi to the nth power*)
+        rational result;
+        integer cur;
+        {
+            cur := raiseTo;
+            result := 1.0;
+            while(cur > 0) do
+            {
+                if(raisePhi) then
+                {
+                    result := result .*.  phi;
+                } else
+                {
+                    result := invPhi .*. invPhi;
+                } fi;
+                cur := cur - 1;
+            } od;
+
+            if(raisePhi) then
+            {
+                phi := result;
+            }
+            else 
+            {
+                invPhi := result;
+            } fi;
+        };
+
+    {
+        n := maxVal;
+        (*sqrt5 := 2.2360679774997896964091736687313;*) (*square root of 5*)
+        sqrt5 := 2.2361; (*approximate value*)
+        phi := (sqrt5 .+. 1.0) ./. 2.0; (*phi is the golden ratio*)  
+        invPhi := (1.0 .-. sqrt5) ./. 2.0; (*inverse of phi*)
+        raiseTo := n;
+        raisePhi := tt; (*tt means true*)
+        call power; (*raises phi to the power n*)
+        raisePhi := ff;
+        call power; (*raises invPhi to the power n*)
+        final := (phi .-. invPhi) ./. sqrt5; (*final is the nth fibonacci term*)
+    };
+{
+    maxVal := 10; (*default value*)
+    read(maxVal); a := 1; b := 1;
+    read(shouldRunEstimateToo); (*not recommended for higher maxVal as rational computation is done exact and not estimated, hence very costly*)
+    call iterativeFibonacci;
+    print(a);  (*multiple comments possible*)
+    if(shouldRunEstimateToo)
+    then
+    {
+        call estimateFibonacci;
+        print((final)); (*toDecimal is even more costly, but is easier to read*)
+    }
+    else
+    {
+
+    } fi;
+
+}
+ 

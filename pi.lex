@@ -29,7 +29,8 @@ fun containsDecimal(x:string) =
 alpha = [A-Za-z];
 num = [0-9.~()];
 allAscii = . | "\n";
-comments = "(*" {allAscii}* "*)";
+noEndComment = [^*] | "*" [^)];
+comments = "(*" {noEndComment}* "*)";
 integer=[~]?[0-9]+;
 deci = [~]?[0-9]*\.[0-9]+ | [~]?[0-9]*\.[0-9]*\([0-9]+\);
 alphanum = [0-9a-zA-Z];
@@ -97,4 +98,5 @@ spaces = [\ \t];
 {deci} => (col := !col + String.size(yytext); T.DECI(yytext,!lin,!col));
 {alpha}{alphanum}* => (col := !col + String.size(yytext); T.IDENT(yytext,!lin,!col));
 {comments} => (continue());
+"~" => (col := !col + 1; T.NEG(!lin,!col));
 . => (print("unmatched character typed "^yytext^"\n"); continue());

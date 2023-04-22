@@ -9,7 +9,7 @@ struct
                   add of EXP * EXP | sub of EXP * EXP | mul of EXP * EXP | divOp of EXP * EXP 
                 |   ratadd of EXP * EXP | ratsub of EXP * EXP | ratmul of EXP * EXP | ratdivOp of EXP * EXP
                 | modOp of EXP * EXP | makeRat of EXP * EXP | inverse of EXP
-                | int of EXP |  rat of EXP | bool of EXP
+                | int of EXP |  rat of EXP | bool of EXP | neg of EXP
                 (* | bool of EXP | eq of EXP*EXP | neq of EXP*EXP | andOp of EXP*EXP | lt of EXP*EXP *)
                 | var of string | intType of BigInt.bigint | ratType of Rational.rational | boolType of bool 
                 | eq of EXP*EXP | neq of EXP*EXP | andOp of EXP*EXP 
@@ -243,7 +243,10 @@ struct
     fun getBoolOut(boolType(a)) = a
     |   getBoolOut(_) = raise typeMismatched;
 
-
+    fun negate(a) =
+        case a of
+            ratType(a) => ratType(Rational.neg(a))
+        |   intType(a) => intType(BigInt.neg(a))
     fun eval((intType a, c) | (int(intType a),c)) = intType (a)
         |   eval((ratType a, c) | (rat(ratType a),c)) = ratType (a)
         |   eval(int(add(a,b)),c) = Add(eval(a,c),eval(b,c))
@@ -285,6 +288,7 @@ struct
                 intType(d) => ratType(valOf(Rational.make_rat(BigInt.getBigInt("1"),d)))
                 | ratType(d) => ratType(valOf(Rational.inverse(d)))
             end
+        |   eval(neg(a),c) = negate(eval(a,c))
             
        
             
@@ -350,11 +354,13 @@ struct
                 val SOME(value) = (print(a^":= ") ;TextIO.inputLine(TextIO.stdIn))
                 val readValue = getRidOfTrailingNewLine(value);
             in
-                (assignVar(a, intType(BigInt.getBigInt(readValue)), scopes)) handle _ => (assignVar(a, ratType(Rational.fromDecimal(readValue)), scopes))
+                (((assignVar(a, intType(BigInt.getBigInt(readValue)), scopes)) handle _ => 
+                (assignVar(a, ratType(Rational.fromDecimal(readValue)), scopes))) handle _ => 
+                (assignVar(a, boolType(valOf(Bool.fromString(readValue))), scopes))) handle _ => raise typeMismatched
             end
 
     and runCMDSeq(empty, scopes) = ()
-        |   runCMDSeq(cons(a,b), scopes) = ((runCMD(a, scopes)) handle typeMismatched => print("raised typeMismatched. \n please type check your code again. \n"); runCMDSeq(b, scopes))
+        |   runCMDSeq(cons(a,b), scopes) = ((runCMD(a, scopes)) handle typeMismatched => (print("raised typeMismatched. \n please type check your code again. \n");raise typeMismatched); runCMDSeq(b, scopes))
 
     and runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
         let

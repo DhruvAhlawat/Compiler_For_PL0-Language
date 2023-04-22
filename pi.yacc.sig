@@ -38,6 +38,7 @@ val EOF:  'a * 'a -> (svalue,'a) token
 val EOL:  'a * 'a -> (svalue,'a) token
 val DISPLAY:  'a * 'a -> (svalue,'a) token
 val NUMBA: (string) *  'a * 'a -> (svalue,'a) token
+val NEG:  'a * 'a -> (svalue,'a) token
 val TRUE:  'a * 'a -> (svalue,'a) token
 val FALSE:  'a * 'a -> (svalue,'a) token
 val RATDIV:  'a * 'a -> (svalue,'a) token

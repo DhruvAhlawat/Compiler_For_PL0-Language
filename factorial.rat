@@ -1,0 +1,16 @@
+integer maxVal;
+procedure printFactorials
+integer a,b;
+{
+    a := 1; b:= 1;
+    while(b < maxVal) do
+    {
+        print(a);
+        a := a * (b+1);
+        b := b + 1;
+    } od;
+};
+{
+    maxVal := 10;
+    call printFactorials;
+}

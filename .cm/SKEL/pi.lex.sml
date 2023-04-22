@@ -1,3 +1,2 @@
 Skeleton 5
-ae"PiLexFun"i2aä¢Tokens"gp1c"Pi_TOKENS"f2d"Char"ä¢TextIO"h3aä¢yyInput"jh3aä¢TIO"gp1ÿ0ad"TSIO"gp2ÿ
-d"StreamIO"ad"TPIO"gp1d"TextPrimIO"h0aä¢UserDeclarations"h1aä¢T"gp1ÿbbd2egp1ÿ‚	f7d"List"ÿ‚Cd"Vector"d"IO"ÿ‚	d"String"ÿ<Nf0f1ÿ<
+ae"PiLexFun"i2aä¢Tokens"gp1c"Pi_TOKENS"f3d"List"ä¢Vector"ä¢String"h3aä¢UserDeclarations"h1aä¢T"gp1ÿaä¢Internal"h1aä¢StartStates"h0bbbbd2bc2egp1ÿegp2ÿ%ÿ3f3ÿÿ9ÿ%f2ä¢Unsafe"ÿ%f6d"Char"Cÿ‚)ÿ0ÿÿ9ÿ%Næ0ÿƒÿƒ

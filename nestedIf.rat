@@ -1,0 +1,26 @@
+boolean a,b,c;
+{
+    a := tt;
+    b := ff;
+    if(a) then
+    {
+        if(b) then
+        {
+            print(80085);
+        } else
+        {
+            print(80086);
+        } fi;
+   }
+   else 
+   {
+        if(c) then
+        {
+            print(80087);
+        } else
+        {
+            print(80088);
+        } fi;
+   } fi;
+   
+}

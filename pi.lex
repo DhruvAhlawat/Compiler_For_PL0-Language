@@ -32,7 +32,7 @@ allAscii = . | "\n";
 noEndComment = [^*] | "*" [^)];
 comments = "(*" {noEndComment}* "*)";
 integer=[~]?[0-9]+;
-deci = [~]?[0-9]*\.[0-9]+ | [~]?[0-9]*\.[0-9]*\([0-9]+\);
+deci = [~]?[0-9]*\.[0-9]*\([0-9]+\);
 alphanum = [0-9a-zA-Z];
 spaces = [\ \t];
 %%

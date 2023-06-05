@@ -24,7 +24,7 @@ boolean shouldRunEstimateToo;
         integer cur;
         {
             cur := raiseTo;
-            result := 1.0;
+            result := 1.(0);
             while(cur > 0) do
             {
                 if(raisePhi) then
@@ -49,10 +49,10 @@ boolean shouldRunEstimateToo;
 
     {
         n := maxVal;
-        (*sqrt5 := 2.2360679774997896964091736687313;*) (*square root of 5*)
-        sqrt5 := 2.2361; (*approximate value*)
-        phi := (sqrt5 .+. 1.0) ./. 2.0; (*phi is the golden ratio*)  
-        invPhi := (1.0 .-. sqrt5) ./. 2.0; (*inverse of phi*)
+        (*sqrt5 := 2.2360679774997896964091736687313(0);*) (*square root of 5*)
+        sqrt5 := 2.2361(0); (*approximate value*)
+        phi := (sqrt5 .+. 1.(0)) ./. 2.(0); (*phi is the golden ratio*)  
+        invPhi := (1.(0) .-. sqrt5) ./. 2.(0); (*inverse of phi*)
         raiseTo := n;
         raisePhi := tt; (*tt means true*)
         call power; (*raises phi to the power n*)

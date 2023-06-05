@@ -1,0 +1,6 @@
+Changes are as follows
+:-
+1. on line 11 of static_scope.rat, removed the nested comment to make only one comment.
+2. exp2.rat , changed a nested comment into a single comment. (removed the *) of the nested comments). Also added brackets at the last statement comparision.
+
+3. make an add to head function to add to tail function.

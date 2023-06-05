@@ -12,7 +12,7 @@ Since 'true' and 'false' are not keywords, 'tt' and 'ff' are used instead for bo
 
  - important note -> Variables that have the same name CAN be defined but code will only use the most recent declaration of the variable name. so if we have rational a; integer a; then in this case 'a' will always refer to the integer variable 'a' and *NOT* the rational variable. Hence multiple variables with same name in the same scope can exist but there is no point since only the most recent one will be used. this is in accordance with languages like sml.
 
-5. print(a) would print a rational in the fractional form if a is a rational expression or variable, and an integer if it is an integer variable or expression, and 'true' or 'false' if it is a boolean expression or variable. for additional functionality, print(toDecimal(a)) or print(showDecimal(a)) will print a rational in its decimal normal form. toDecimal, showDecimal, showRat can only be used inside print statements.
+5. print(a) would print a rational in the decimal normal form if a is a rational expression or variable, and an integer if it is an integer variable or expression, and 'true' or 'false' if it is a boolean expression or variable. for additional functionality, print(toDecimal(a)) or print(showDecimal(a)) will print a rational in its decimal normal form. toDecimal, showDecimal, showRat can only be used inside print statements.
 
 6. since 'var' is a keyword, I have added the functionality that a variable 'a' can be referred to as just 'a' in expressions, or as 'var(a)' or var a. This may make the language more readable.
 
@@ -29,11 +29,12 @@ Since 'true' and 'false' are not keywords, 'tt' and 'ff' are used instead for bo
 1. Go into the folder with the files.
 2. run the 'sml' command which opens sml in the terminal.
 3. run
-
         CM.make "pi.cm";
-4. then you can run the files 
+4. run
+        use "make.sml";
+4. then you can run the files using the interpret command. (make.sml is needed as it opens the Pi structure)
 
-        Pi.compile "factorial.rat";
+        interpret("testfile.rat", "outfile.txt");
 
  - some testfiles  "recursiontest.rat", "factorial.rat", "fibonacci.rat", "nestedIf.rat", "estimateFibonacci.rat" are also included
 

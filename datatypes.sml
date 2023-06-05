@@ -1,7 +1,7 @@
 (* use "rational.sml"; *)
 (* open SymbolTable *)
 (* use "symbolTable.sml" *)
-val cmdline = TextIO.stdIn; 
+
 
 structure DataTypes =
 struct
@@ -130,16 +130,17 @@ struct
                 in
                     findMatchingScope(a, b)
                 end
-            fun checkAllScopes([]) = raise VariableNotDeclared
+            fun checkAllScopes([]) = raise VarIncorrectTypeOrNotDeclared
             |   checkAllScopes((scope::t)) = 
                 case getVarExp(varList, scope) of
                     NONE => checkAllScopes(t)
                     | SOME exp => exp
         in
-            checkAllScopes(scopes)
+             (checkAllScopes(scopes))
         end
 
 
+    
     fun assignVar (name:string, exp:EXP, scopes :int list) =
         let
             val varList = HashTable.lookup varMap name; (*returns an exception if the variable has not been declared*)
@@ -148,14 +149,14 @@ struct
                 case findAndRemovePreviousVarValue(varList, scope) of
                     NONE => checkAllScopes(t)
                     | SOME (l, prevExp) => (  case (prevExp, exp) of 
-                            (intType(_), intType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
-                            | (ratType(_), ratType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
-                            | (boolType(_), boolType(_)) => HashTable.insert varMap (name, (exp, scope)::l)
+                            (intType(_), intType(_)) => HashTable.insert varMap (name, l@[(exp, scope)])
+                            | (ratType(_), ratType(_)) => HashTable.insert varMap (name, l@[(exp, scope)])
+                            | (boolType(_), boolType(_)) => HashTable.insert varMap (name, l@[(exp, scope)])
                             | (_,_) => raise   VarIncorrectTypeOrNotDeclared)   
                             (*if we found a matching scope, then its previous value would have been deleted so we insert a new exp,scope in l and put it in the hashmap*)
                     
         in
-            checkAllScopes(scopes)
+            (checkAllScopes(scopes))
         end
 
 
@@ -187,7 +188,19 @@ struct
 (*end of symbolTable Stuff*)
 
     
+    val outFile = ref (TextIO.stdOut);
+    val inFile = ref (TextIO.stdIn);
 
+(* fun interpret(inputFile, outputFile) = 
+let
+    outFile := TextIO.openOut(outputFile);
+    inFile  := TextIO.openIn(inputFile);
+in
+    ()     Pi.compile inFile 
+end; *)
+
+
+    fun printOut(s:string) = TextIO.output((!outFile), s);
 
     fun assignBlockScopes(block(decSeq(_,a),_,curScope,L), parentScopes) = 
         let
@@ -305,8 +318,12 @@ struct
             implode(removeTrailingNewLine(strList))
         end
 
-
+    fun getBoolFromString("tt") = true
+    |   getBoolFromString("ff") = false
+    |   getBoolFromString(_) = raise typeMismatched;
     
+
+
     fun CallProcedure(name:string, parentScopes) = 
         let
             val procNamedList = HashTable.lookup procMap name
@@ -330,37 +347,37 @@ struct
     and runCMD(PrintCMD(a), scopes) = 
         let 
             val b = eval(a,scopes); 
-            fun printHelper(intType(a)) = print(implode (a))
-            |   printHelper(ratType(a)) = print(Rational.showRat(a))
-            |   printHelper(boolType(a)) = print(Bool.toString(a))
+            fun printHelper(intType(a)) = printOut(implode (a))
+            |   printHelper(ratType(a)) = printOut(Rational.toDecimal(a)) (*prints in decimal form, because of the updates added after the original deadline*)
+            |   printHelper(boolType(a)) = if(a) then (printOut("tt")) else (printOut("ff"))
             in 
-                (printHelper(b); print("\n")) (*printing a new line for ease of viewing printed text*) (*perhaps gotta CHANGE since no newline prints were mentioned in assighnment*)
+                (printHelper(b); printOut("\n")) (*printing a new line for ease of viewing printed text*) (*perhaps gotta CHANGE since no newline prints were mentioned in assighnment*)
             end
         |   runCMD(PrintDecCMD(a), scopes) =
             let 
                 val b = eval(a,scopes); 
             in
             case b of 
-                ratType(c) => (print(Rational.toDecimal(c)); print("\n"))
+                ratType(c) => (printOut(Rational.toDecimal(c)); printOut("\n")) (*prints in decimal form too.*)
                 |   _ => raise typeMismatched 
             end
-        (* |   runCMD(PrintBool(a), scopes) = (print(Bool.toString(evalBool(a,scopes))); print("\n")) *)
+        (* |   runCMD(PrintBool(a), scopes) = (printOut(Bool.toString(evalBool(a,scopes))); printOut("\n")) *)
         |   runCMD(ConditionalCMD(a,b,c), scopes) = if (getBoolOut(eval(a, scopes))) then runCMDSeq(b, scopes) else runCMDSeq(c, scopes)
         |   runCMD(AssignCMD(a,b), scopes) = assignVar(a, eval(b,scopes), scopes)
         |   runCMD(WhileCMD(a,b), scopes) = if(getBoolOut(eval(a,scopes))) then (runCMDSeq(b, scopes); runCMD(WhileCMD(a,b), scopes)) else ()
         |   runCMD(CallCMD(a), scopes) = CallProcedure(a, scopes)
         |   runCMD(ReadCMD(a),scopes) = 
             let 
-                val SOME(value) = (print(a^":= ") ;TextIO.inputLine(TextIO.stdIn))
+                val SOME(value) = TextIO.inputLine(TextIO.stdIn)
                 val readValue = getRidOfTrailingNewLine(value);
             in
                 (((assignVar(a, intType(BigInt.getBigInt(readValue)), scopes)) handle _ => 
                 (assignVar(a, ratType(Rational.fromDecimal(readValue)), scopes))) handle _ => 
-                (assignVar(a, boolType(valOf(Bool.fromString(readValue))), scopes))) handle _ => raise typeMismatched
+                (assignVar(a, boolType(getBoolFromString(readValue)), scopes))) handle _ => (printOut("value doesn't correspond to type"); raise typeMismatched)
             end
 
     and runCMDSeq(empty, scopes) = ()
-        |   runCMDSeq(cons(a,b), scopes) = ((runCMD(a, scopes)) handle typeMismatched => (print("raised typeMismatched. \n please type check your code again. \n");raise typeMismatched); runCMDSeq(b, scopes))
+        |   runCMDSeq(cons(a,b), scopes) = ((runCMD(a, scopes)) handle typeMismatched => (printOut("raised typeMismatched. \n please type check your code again. \n");raise typeMismatched); runCMDSeq(b, scopes))
 
     and runBlock(block(decSeq(a,b),c,curScope,parentScopes)) = 
         let
